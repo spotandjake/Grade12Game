@@ -93,5 +93,9 @@ namespace Grade12Game
         this.animationPlayer.StartClip(this.animationClip);
       }
     }
+    public void Draw(Camera cam, Renderer renderer)
+    {
+        renderer.DrawGameObject(cam, this);
+    }
   }
 }

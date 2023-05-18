@@ -73,6 +73,7 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InputHandler.cs" />
     <Compile Include="ModelRenderer.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Camera.cs" />
