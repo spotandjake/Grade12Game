@@ -12,7 +12,7 @@ using SkinnedModel;
 
 namespace Grade12Game
 {
-  public abstract class GameObject
+  public class GameObject
   {
     // Internals
     private Vector3 position;

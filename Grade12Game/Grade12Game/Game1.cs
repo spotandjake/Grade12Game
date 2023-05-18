@@ -19,10 +19,14 @@ namespace Grade12Game
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        ModelRenderer FishMen; //Your new Fish model
-        Vector3 cameraPosition = new Vector3(0, 0, 20); //Defines the position of the camera in the 3D space
-        Vector3 cameraRotation = new Vector3(0, 0, 0);
+        Renderer renderer;
         float farPlaneDistance = 400f; //Defines your plane distance, the higher, the less 3D 'fog' and the more is displayed
+
+        InputHandler inputHandler;
+
+        Camera camera;
+
+        GameObject character;
 
         public Game1()
         {
@@ -39,7 +43,9 @@ namespace Grade12Game
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            this.renderer = new Renderer(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, farPlaneDistance);
+            this.camera = new Camera(new Vector3(0, -20, 0), new Vector3(0, 0, 0));
+            this.inputHandler = new InputHandler(PlayerIndex.One);
             base.Initialize();
         }
 
@@ -56,8 +62,8 @@ namespace Grade12Game
 
             Content.RootDirectory = "Content";
             currentModel = Content.Load<Model>("Models/dude"); //Loads your new model, point it towards your model
-            FishMen = new ModelRenderer(currentModel);
-            FishMen.PlayAnimation("Take 001");//Play the default swimming animation
+            this.character = new GameObject(currentModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+            this.character.PlayAnimation("Take 001");
 
             // TODO: use this.Content to load your game content here
         }
@@ -82,7 +88,9 @@ namespace Grade12Game
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            FishMen.Update(gameTime);
+            this.inputHandler.Update(gameTime);
+            this.camera.Update(gameTime, inputHandler);
+            this.character.Update(gameTime);
 
             // TODO: Add your update logic here
 
@@ -96,7 +104,7 @@ namespace Grade12Game
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            FishMen.ModelDraw(GraphicsDevice, cameraPosition, cameraRotation, farPlaneDistance);
+            this.character.Draw(camera, renderer);
 
             // TODO: Add your drawing code here
 
