@@ -30,7 +30,17 @@ namespace Grade12Game
             // Normalize for gameTime
             float time = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             float speed = time / 10;
+            // Set Rotation
+            this.rotation.Y += MathHelper.ToRadians(inputHandler.PitchAxis * speed);
+            this.rotation.X += MathHelper.ToRadians(inputHandler.YawAxis * speed);
+            // Calc Velocity
+            Vector3 velocity = new Vector3(0, 0, 0);
+            velocity.X += (inputHandler.ForwardAxis * this.rotation.X + inputHandler.SideAxis * this.rotation.Y);
+            velocity.Z += (inputHandler.ForwardAxis * this.rotation.X + inputHandler.SideAxis * this.rotation.Y);
             // Set Position
+            this.position.X += velocity.X;
+            this.position.Z += velocity.Z;
+            this.position.Z += velocity.Z;
         }
         public void setPosition(Vector3 position)
         {

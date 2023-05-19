@@ -70,18 +70,9 @@ namespace Grade12Game
                     * Matrix.CreateWorld(position, Vector3.Forward, Vector3.Up); //Move the models position
               }
               // TODO: Create Camera View Matrix
-              Matrix view2 =
-                // TODO: Figure out if we can make this directly from the vector
-                Matrix.CreateTranslation(camPosition.X, camPosition.Y, camPosition.Z)
-                // TODO: I think we can do the rotation in one line
-                * Matrix.CreateRotationX(camRotation.X)
-                * Matrix.CreateRotationY(camRotation.Y)
-                * Matrix.CreateRotationZ(camRotation.Z)
-                * Matrix.CreateLookAt(new Vector3(0, 0, -20),
-                                                new Vector3(0, 0, 0), Vector3.Up);
-            Matrix view = Matrix.CreateTranslation(0, -40, 0) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(10)) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(10)) *
+            Matrix view = Matrix.CreateTranslation(camPosition.X, camPosition.Y, camPosition.Z) *
+                Matrix.CreateRotationY((camRotation.Y)) *
+                Matrix.CreateRotationX((camRotation.X)) *
                 Matrix.CreateLookAt(new Vector3(0, 0, 300),
                                     new Vector3(0, 0, 0), Vector3.Up);
             // Draw Model
