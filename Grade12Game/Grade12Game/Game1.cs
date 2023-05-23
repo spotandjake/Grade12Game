@@ -44,7 +44,7 @@ namespace Grade12Game
         {
             // TODO: Add your initialization logic here
             this.renderer = new Renderer(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, farPlaneDistance);
-            this.camera = new Camera(new Vector3(0, -20, 0), new Vector3(0, 0, 0));
+            this.camera = new Camera(new Vector3(0, -70, -50), new Vector3(0, 0, 0));
             this.inputHandler = new InputHandler(PlayerIndex.One);
             base.Initialize();
         }

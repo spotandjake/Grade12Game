@@ -35,11 +35,11 @@ namespace Grade12Game
             this.rotation.X += MathHelper.ToRadians(inputHandler.YawAxis * speed);
             // Calc Velocity
             Vector3 velocity = new Vector3(0, 0, 0);
-            velocity.X += (inputHandler.ForwardAxis * this.rotation.X + inputHandler.SideAxis * this.rotation.Y);
-            velocity.Z += (inputHandler.ForwardAxis * this.rotation.X + inputHandler.SideAxis * this.rotation.Y);
+            velocity.X += (inputHandler.ForwardAxis * (float)Math.Sin(-this.rotation.Y) + inputHandler.SideAxis * -(float)Math.Cos(-this.rotation.Y));
+            velocity.Z += (inputHandler.ForwardAxis * (float)Math.Cos(-this.rotation.Y) + inputHandler.SideAxis * (float)Math.Sin(-this.rotation.Y));
             // Set Position
             this.position.X += velocity.X;
-            this.position.Z += velocity.Z;
+            this.position.Y += velocity.Y;
             this.position.Z += velocity.Z;
         }
         public void setPosition(Vector3 position)
