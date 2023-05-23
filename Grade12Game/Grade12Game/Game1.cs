@@ -20,7 +20,7 @@ namespace Grade12Game
         SpriteBatch spriteBatch;
 
         Renderer renderer;
-        float farPlaneDistance = 400f; //Defines your plane distance, the higher, the less 3D 'fog' and the more is displayed
+        float farPlaneDistance = 800f; //Defines your plane distance, the higher, the less 3D 'fog' and the more is displayed
 
         InputHandler inputHandler;
 
