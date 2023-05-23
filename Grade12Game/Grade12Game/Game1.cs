@@ -27,6 +27,7 @@ namespace Grade12Game
         Camera camera;
 
         GameObject character;
+        GameObject cube;
 
         public Game1()
         {
@@ -58,12 +59,12 @@ namespace Grade12Game
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Model currentModel; //Temporary storage for your new model
-
             Content.RootDirectory = "Content";
-            currentModel = Content.Load<Model>("Models/dude"); //Loads your new model, point it towards your model
-            this.character = new GameObject(currentModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+            Model characterModel = Content.Load<Model>("Models/dude"); //Loads your new model, point it towards your model
+            this.character = new GameObject(characterModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
             this.character.PlayAnimation("Take 001");
+            Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
+            this.cube = new GameObject(cubeModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
             // TODO: use this.Content to load your game content here
         }
@@ -91,6 +92,7 @@ namespace Grade12Game
             this.inputHandler.Update(gameTime);
             this.camera.Update(gameTime, inputHandler);
             this.character.Update(gameTime);
+            this.cube.Update(gameTime);
 
             // TODO: Add your update logic here
 
@@ -105,6 +107,7 @@ namespace Grade12Game
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             this.character.Draw(camera, renderer);
+            this.cube.Draw(camera, renderer);
 
             // TODO: Add your drawing code here
 
