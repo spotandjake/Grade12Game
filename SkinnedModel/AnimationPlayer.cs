@@ -23,25 +23,20 @@ namespace SkinnedModel
     {
         #region Fields
 
-
         // Information about the currently playing animation clip.
         AnimationClip currentClipValue;
         TimeSpan currentTimeValue;
         int currentKeyframe;
-
 
         // Current animation transform matrices.
         Matrix[] boneTransforms;
         Matrix[] worldTransforms;
         Matrix[] skinTransforms;
 
-
         // Backlink to the bind pose and skeleton hierarchy data.
         SkinningData skinningDataValue;
 
-
         #endregion
-
 
         /// <summary>
         /// Constructs a new animation player.
@@ -57,7 +52,6 @@ namespace SkinnedModel
             worldTransforms = new Matrix[skinningData.BindPose.Count];
             skinTransforms = new Matrix[skinningData.BindPose.Count];
         }
-
 
         /// <summary>
         /// Starts decoding the specified animation clip.
@@ -75,18 +69,16 @@ namespace SkinnedModel
             skinningDataValue.BindPose.CopyTo(boneTransforms, 0);
         }
 
-
         /// <summary>
         /// Advances the current animation position.
         /// </summary>
         public void Update(TimeSpan time, bool relativeToCurrentTime,
-                           Matrix rootTransform)
+            Matrix rootTransform)
         {
             UpdateBoneTransforms(time, relativeToCurrentTime);
             UpdateWorldTransforms(rootTransform);
             UpdateSkinTransforms();
         }
-
 
         /// <summary>
         /// Helper used by the Update method to refresh the BoneTransforms data.
@@ -95,7 +87,7 @@ namespace SkinnedModel
         {
             if (currentClipValue == null)
                 throw new InvalidOperationException(
-                            "AnimationPlayer.Update was called before StartClip");
+                    "AnimationPlayer.Update was called before StartClip");
 
             // Update the animation position.
             if (relativeToCurrentTime)
@@ -137,7 +129,6 @@ namespace SkinnedModel
             }
         }
 
-
         /// <summary>
         /// Helper used by the Update method to refresh the WorldTransforms data.
         /// </summary>
@@ -152,10 +143,9 @@ namespace SkinnedModel
                 int parentBone = skinningDataValue.SkeletonHierarchy[bone];
 
                 worldTransforms[bone] = boneTransforms[bone] *
-                                             worldTransforms[parentBone];
+                    worldTransforms[parentBone];
             }
         }
-
 
         /// <summary>
         /// Helper used by the Update method to refresh the SkinTransforms data.
@@ -165,10 +155,9 @@ namespace SkinnedModel
             for (int bone = 0; bone < skinTransforms.Length; bone++)
             {
                 skinTransforms[bone] = skinningDataValue.InverseBindPose[bone] *
-                                            worldTransforms[bone];
+                    worldTransforms[bone];
             }
         }
-
 
         /// <summary>
         /// Gets the current bone transform matrices, relative to their parent bones.
@@ -178,7 +167,6 @@ namespace SkinnedModel
             return boneTransforms;
         }
 
-
         /// <summary>
         /// Gets the current bone transform matrices, in absolute format.
         /// </summary>
@@ -186,7 +174,6 @@ namespace SkinnedModel
         {
             return worldTransforms;
         }
-
 
         /// <summary>
         /// Gets the current bone transform matrices,
@@ -197,22 +184,26 @@ namespace SkinnedModel
             return skinTransforms;
         }
 
-
         /// <summary>
         /// Gets the clip currently being decoded.
         /// </summary>
         public AnimationClip CurrentClip
         {
-            get { return currentClipValue; }
+            get
+            {
+                return currentClipValue;
+            }
         }
-
 
         /// <summary>
         /// Gets the current play position.
         /// </summary>
         public TimeSpan CurrentTime
         {
-            get { return currentTimeValue; }
+            get
+            {
+                return currentTimeValue;
+            }
         }
     }
 }

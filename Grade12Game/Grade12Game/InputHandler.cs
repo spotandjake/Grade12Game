@@ -12,17 +12,33 @@ using SkinnedModel;
 
 namespace Grade12Game
 {
-  public class InputHandler
-  {
+    public class InputHandler
+    {
         // Internals
         private PlayerIndex playerIndex;
         private GamePadState oldPadState;
         private KeyboardState oldKeyState;
         // Axis
-        public float ForwardAxis { get; private set; }
-        public float SideAxis { get; private set; }
-        public float PitchAxis { get; private set; }
-        public float YawAxis { get; private set; }
+        public float ForwardAxis
+        {
+            get;
+            private set;
+        }
+        public float SideAxis
+        {
+            get;
+            private set;
+        }
+        public float PitchAxis
+        {
+            get;
+            private set;
+        }
+        public float YawAxis
+        {
+            get;
+            private set;
+        }
         // Constructor
         public InputHandler(PlayerIndex playerIndex)
         {
@@ -66,5 +82,5 @@ namespace Grade12Game
         {
             this.playerIndex = playerIndex;
         }
-  }
+    }
 }

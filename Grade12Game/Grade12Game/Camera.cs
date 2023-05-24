@@ -12,17 +12,17 @@ using SkinnedModel;
 
 namespace Grade12Game
 {
-  public class Camera
-  {
+    public class Camera
+    {
         // Internals
         private Vector3 position;
         private Vector3 rotation;
         // Constructor
         public Camera(Vector3 position, Vector3 rotation)
         {
-          // Set Internals
-          this.setPosition(position);
-          this.setRotation(rotation);
+            // Set Internals
+            this.setPosition(position);
+            this.setRotation(rotation);
         }
         // Public Methods
         public void Update(GameTime gameTime, InputHandler inputHandler)
@@ -44,19 +44,19 @@ namespace Grade12Game
         }
         public void setPosition(Vector3 position)
         {
-          this.position = position;
+            this.position = position;
         }
         public Vector3 getPosition()
         {
-          return this.position;
+            return this.position;
         }
         public void setRotation(Vector3 rotation)
         {
-          this.rotation = rotation;
+            this.rotation = rotation;
         }
         public Vector3 getRotation()
         {
-          return this.rotation;
+            return this.rotation;
         }
-  }
+    }
 }
