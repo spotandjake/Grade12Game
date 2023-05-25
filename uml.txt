@@ -1,0 +1,95 @@
+@startuml
+namespace Grade12Game {
+    class Renderer << (S,Aquamarine) >> {
+        - setScreenSize(int width, int height) void
+        - DrawGameObject(Camera camera, GameObject gameObject) void 
+    }
+    class GameObject << (S,Aquamarine) >> {
+        - position Vector3
+        - rotation Vector3
+        - scale Vector3
+        - model Model
+        - skinningData SkinningData
+        - animationPlayer AnimationPlayer
+        - animationClip AnimationClip
+        - hasBones bool
+
+        - Update(GameTime gameTime) void 
+        - setModel(Model model) void 
+        - getModel() Model 
+        - setPosition(Vector3 position) void 
+        - getPosition() Vector3 
+        - setRotation(Vector3 rotation) void 
+        - getRotation() Vector3 
+        - setScale(Vector3 scale) void 
+        - getScale() Vector3 
+        - getAnimationPlayer() AnimationPlayer 
+        - getHasBones() bool 
+        - PlayAnimation(String Animation) void 
+        - Draw(Camera cam, Renderer renderer) void 
+    }
+    class World {
+      - world int[][][];
+
+      - generateWorldChunk(Vector3 position) int[][]
+      - getWorldChunk(Vector3 position) int[][]
+
+    }
+    class Camera {
+      - position Vector3 ;
+      - rotation Vector3 ;
+
+      - Update(GameTime gameTime, InputHandler inputHandler) void
+      - setPosition(Vector3 position) void 
+      - getPosition() Vector3 
+      - setRotation(Vector3 rotation) void 
+      - getRotation() Vector3 
+    }
+    class InputHandler {
+        - playerIndex PlayerIndex 
+        - oldPadState GamePadState 
+        - oldKeyState KeyboardState 
+        - ForwardAxis float 
+        - SideAxis float 
+        - PitchAxis float 
+        - YawAxis float 
+        - Update(GameTime gameTime) void 
+        - setPlayerIndex(PlayerIndex playerIndex) void 
+    }
+
+    class Character << (S,Aquamarine) >> {
+        - health int
+    }
+    class Player << (S,Aquamarine) >> {
+        - camera Camera
+        - getCamera() Camera
+        - Update(GameTime gameTime, InputHandler inputHandler) void
+    }
+    class Enemy<< (S,Aquamarine) >> {
+        - Update(GameTime gameTime, InputHandler inputHandler) void
+    }
+    class Tower<< (S,Aquamarine) >> {
+        - base BaseType
+    }
+    class TurretTower<< (S,Aquamarine) >> {
+        - Update(GameTime gameTime, InputHandler inputHandler) void
+    }
+    class SniperTower<< (S,Aquamarine) >> {
+        - Update(GameTime gameTime, InputHandler inputHandler) void
+    }
+    class MachineGunTower<< (S,Aquamarine) >> {
+        - Update(GameTime gameTime, InputHandler inputHandler) void
+    }
+}
+Grade12Game.GameObject <|-- Grade12Game.Character
+
+Grade12Game.GameObject  <|-- Grade12Game.Tower
+
+Grade12Game.Character <|-- Grade12Game.Player
+
+Grade12Game.Character <|-- Grade12Game.Enemy
+
+Grade12Game.Tower<|-- Grade12Game.TurretTower
+Grade12Game.Tower<|-- Grade12Game.SniperTower
+Grade12Game.Tower<|-- Grade12Game.MachineGunTower
+@enduml
