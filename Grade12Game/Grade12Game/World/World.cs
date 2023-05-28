@@ -36,7 +36,7 @@ namespace Grade12Game
         // we choose a random position on the output side so we have a start and end position
         // Then we will generate random obstacles in our matrix and ind a path through them, if there is no path we will regenerate the obstacles and try again.
         // Contants
-        private const int cellSize = 12;
+        private const int cellSize = 13;
         public const int cellNodeSize = 10;
         private const int obstacleCount = 10; // The higher this is the more likely we are to fail but the better our path should be.
         public enum CellSide
@@ -66,7 +66,7 @@ namespace Grade12Game
             turnsTillNextCell = 0;
             lastSide = CellSide.XMinus;
             nextSide = getNextCellSide(lastSide);
-            cellEndIndex = 10;
+            cellEndIndex = 7;
             nextCellX = 0;
             nextCellY = 0;
             this.nonPathCell = nonPathCell;
@@ -99,16 +99,16 @@ namespace Grade12Game
                 switch (lastSide)
                 {
                     case CellSide.YMinus:
-                        startPosition = new Vector2(0, cellEndIndex);
-                        break;
-                    case CellSide.YPlus:
-                        startPosition = new Vector2(cellSize-1, cellEndIndex);
-                        break;
-                    case CellSide.XMinus:
                         startPosition = new Vector2(cellEndIndex, 0);
                         break;
+                    case CellSide.YPlus:
+                        startPosition = new Vector2(cellEndIndex, cellSize - 1);
+                        break;
+                    case CellSide.XMinus:
+                        startPosition = new Vector2(0, cellEndIndex);
+                        break;
                     case CellSide.XPlus:
-                        startPosition = new Vector2(cellEndIndex, cellSize-1);
+                        startPosition = new Vector2(cellSize - 1, cellEndIndex);
                         break;
                     default:
                         throw new Exception("Impossible Error");
@@ -163,19 +163,32 @@ namespace Grade12Game
                 }
                 // Choose A Random Position (Do Not Allow Corner Cells)
                 int endIndex = rand.Next(1, cellSize); // Should output a value of 1 to 11
+                endIndex = 1;
                 cellEndIndex = endIndex;
                 Vector2 endPosition = makeExitCord(exitSide, endIndex);
                 // Generate Random Obstacles
                 for (int i = 0; i < obstacleCount; i++)
                 {
-                    // Choose A Random Position (Do Not Allow Side Cells, This should prevent it from appearing on start or end pos)
-                    int obstacleX = rand.Next(1, cellSize);
-                    int obstacleY = rand.Next(1, cellSize);
-                    //cellList[obstacleX][obstacleY].Walkable = false;
+                    // Choose A Random Position
+                    int obstacleX = rand.Next(0, cellSize);
+                    int obstacleY = rand.Next(0, cellSize);
+                    if (obstacleX == startPosition.X || obstacleY == startPosition.Y)
+                    {
+                        i--;
+                        continue;
+                    }
+                    if (obstacleX == endPosition.X || obstacleY == endPosition.Y)
+                    {
+                        i--;
+                        continue;
+                    }
+                    cellList[obstacleX][obstacleY].Walkable = false;
                 }
                 // Solve Our PathFinding
                 Astar finder = new Astar(cellList);
                 path = finder.FindPath(startPosition, endPosition);
+                // TODO: Ensure We have reached the end
+                // Write to cell
                 for (int i = 0; i < path.Count; i++)
                 {
                     Node node = path.Pop();
