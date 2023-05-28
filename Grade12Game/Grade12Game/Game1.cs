@@ -28,6 +28,7 @@ namespace Grade12Game
 
         GameObject character;
         GameObject cube;
+        World world;
 
         public Game1()
         {
@@ -65,6 +66,10 @@ namespace Grade12Game
             this.character.PlayAnimation("Take 001");
             Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
             this.cube = new GameObject(cubeModel, new Vector3(-10, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+            // Create our World
+            GameObject nonPathBlock = new GameObject(cubeModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+            this.world = new World(nonPathBlock);
+            this.world.advanceTurn();
 
             // TODO: use this.Content to load your game content here
         }
@@ -107,7 +112,8 @@ namespace Grade12Game
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             this.character.Draw(camera, renderer);
-            this.cube.Draw(camera, renderer);
+            //this.cube.Draw(camera, renderer);
+            this.world.Draw(camera, renderer);
 
             // TODO: Add your drawing code here
 
