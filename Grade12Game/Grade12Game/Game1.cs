@@ -30,14 +30,11 @@ namespace Grade12Game
 
         InputHandler inputHandler;
 
+        // TODO: Move this into world to be handled
         Camera camera;
 
         GameObject character;
-        GameObject cube;
         WorldHandler world;
-        CollisionSystem collision;
-        World collisionWorld;
-        RigidBody body;
 
         public Game1()
         {
@@ -53,16 +50,15 @@ namespace Grade12Game
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            collision = new CollisionSystemSAP();
-            collisionWorld = new World(collision);
-            this.renderer = new Renderer(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, farPlaneDistance);
+            // Initialization Logic
+            this.renderer = new Renderer(
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                farPlaneDistance
+            );
             this.camera = new Camera(new Vector3(0, -70, -50), new Vector3(0, 0, 0));
             this.inputHandler = new InputHandler(PlayerIndex.One);
             // Physics Testing
-            Shape shape = new BoxShape(1.0f, 2.0f, 3.0f);
-            body = new RigidBody(shape);
-            collisionWorld.AddBody(body);
             base.Initialize();
         }
 
@@ -72,27 +68,44 @@ namespace Grade12Game
         /// </summary>
         protected override void LoadContent()
         {
+            Shape shape = new BoxShape(1.0f, 2.0f, 3.0f);
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Content.RootDirectory = "Content";
             Model characterModel = Content.Load<Model>("Models/dude"); //Loads your new model, point it towards your model
-            this.character = new GameObject(characterModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+            this.character = new GameObject(
+                characterModel,
+                shape,
+                new Vector3(0, 0, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 1, 1)
+            );
             this.character.PlayAnimation("Take 001");
             Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
-            this.cube = new GameObject(cubeModel, new Vector3(-10, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
-            // Create our World
-            GameObject nonPathBlock = new GameObject(cubeModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+            // Create Our Block Templates
+            GameObject nonPathBlock = new GameObject(
+                cubeModel,
+                shape,
+                new Vector3(0, 0, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(10, 10, 10)
+            );
             Model pathModel = Content.Load<Model>("Models/path"); //Loads your new model, point it towards your model
-            GameObject pathBlock = new GameObject(pathModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+            GameObject pathBlock = new GameObject(
+                pathModel,
+                shape,
+                new Vector3(0, 0, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(10, 10, 10)
+            );
+            // Create Our World
             this.world = new WorldHandler(nonPathBlock, pathBlock);
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
-
-            // TODO: use this.Content to load your game content here
         }
 
         /// <summary>
@@ -111,20 +124,18 @@ namespace Grade12Game
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (step > 1.0f / 100.0f) step = 1.0f / 100.0f;
-            collisionWorld.Step(step, true);
-            //this.character.setPosition(new Vector3(body.Position.X, body.Position.Y, body.Position.Z));
-            Console.WriteLine(body.Position);
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
+            // Update Inputs
             this.inputHandler.Update(gameTime);
+            // Handle Exit
+            if (this.inputHandler.IsExitDown)
+            {
+                this.Exit();
+            }
+            // TODO: Move this into world to be handled
             this.camera.Update(gameTime, inputHandler);
             this.character.Update(gameTime);
-            this.cube.Update(gameTime);
+            // Update World
+            this.camera.Update(gameTime, inputHandler);
 
             // TODO: Add your update logic here
 
@@ -139,7 +150,6 @@ namespace Grade12Game
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             this.character.Draw(camera, renderer);
-            //this.cube.Draw(camera, renderer);
             this.world.Draw(camera, renderer);
 
             // TODO: Add your drawing code here
