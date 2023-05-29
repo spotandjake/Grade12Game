@@ -8,6 +8,12 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Jitter;
+using Jitter.Collision;
+using Jitter.Collision.Shapes;
+using Jitter.DataStructures;
+using Jitter.Dynamics;
+using Jitter.LinearMath;
 
 namespace Grade12Game
 {
@@ -28,7 +34,10 @@ namespace Grade12Game
 
         GameObject character;
         GameObject cube;
-        World world;
+        WorldHandler world;
+        CollisionSystem collision;
+        World collisionWorld;
+        RigidBody body;
 
         public Game1()
         {
@@ -45,9 +54,15 @@ namespace Grade12Game
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            collision = new CollisionSystemSAP();
+            collisionWorld = new World(collision);
             this.renderer = new Renderer(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, farPlaneDistance);
             this.camera = new Camera(new Vector3(0, -70, -50), new Vector3(0, 0, 0));
             this.inputHandler = new InputHandler(PlayerIndex.One);
+            // Physics Testing
+            Shape shape = new BoxShape(1.0f, 2.0f, 3.0f);
+            body = new RigidBody(shape);
+            collisionWorld.AddBody(body);
             base.Initialize();
         }
 
@@ -70,7 +85,7 @@ namespace Grade12Game
             GameObject nonPathBlock = new GameObject(cubeModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
             Model pathModel = Content.Load<Model>("Models/path"); //Loads your new model, point it towards your model
             GameObject pathBlock = new GameObject(pathModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
-            this.world = new World(nonPathBlock, pathBlock);
+            this.world = new WorldHandler(nonPathBlock, pathBlock);
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
@@ -96,6 +111,12 @@ namespace Grade12Game
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (step > 1.0f / 100.0f) step = 1.0f / 100.0f;
+            collisionWorld.Step(step, true);
+            //this.character.setPosition(new Vector3(body.Position.X, body.Position.Y, body.Position.Z));
+            Console.WriteLine(body.Position);
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();

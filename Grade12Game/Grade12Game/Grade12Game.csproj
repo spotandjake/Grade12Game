@@ -91,6 +91,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\JitterPhysics\Jitter.csproj">
+      <Project>{aa03ef1a-94f7-4d30-ab14-2092863ff923}</Project>
+      <Name>Jitter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\SkinnedModelPipeline\SkinnedModelPipeline.csproj">
       <Project>{4636c7e1-b845-4b83-b96d-64a11b8a4515}</Project>
       <Name>SkinnedModelPipeline</Name>

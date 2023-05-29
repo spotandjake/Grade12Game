@@ -22,7 +22,7 @@ namespace Grade12Game
         }
     }
     // World Class
-    public class World
+    public class WorldHandler
     {
         // This Class Holds All Of The Data For Generating And Handling Our World
         // Our world is split up into square chunks and will generate in a swirl
@@ -60,7 +60,7 @@ namespace Grade12Game
         private GameObject nonPathCell;
         private GameObject pathCell;
         // World Construtor
-        public World(GameObject nonPathCell, GameObject pathCell)
+        public WorldHandler(GameObject nonPathCell, GameObject pathCell)
         {
             // Set Our Props
             rand = new Random();
