@@ -29,6 +29,11 @@ namespace Grade12Game
             get;
             private set;
         }
+        public float VerticalAxis
+        {
+            get;
+            private set;
+        }
         public float PitchAxis
         {
             get;
@@ -62,6 +67,12 @@ namespace Grade12Game
             this.SideAxis -= keyState.IsKeyDown(Keys.A) ? 1 : 0;
             if (this.SideAxis < -1) this.SideAxis = -1;
             if (this.SideAxis > 1) this.SideAxis = 1;
+            // Handle Vertial Axis
+            this.VerticalAxis = 0;
+            this.VerticalAxis += keyState.IsKeyDown(Keys.Q) ? 1 : 0;
+            this.VerticalAxis -= keyState.IsKeyDown(Keys.E) ? 1 : 0;
+            if (this.VerticalAxis < -1) this.VerticalAxis = -1;
+            if (this.VerticalAxis > 1) this.VerticalAxis = 1;
             // Handle Pitch
             this.PitchAxis = padState.ThumbSticks.Right.X;
             this.PitchAxis += keyState.IsKeyDown(Keys.Right) ? 1 : 0;

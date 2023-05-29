@@ -36,15 +36,15 @@ namespace Grade12Game
         // we choose a random position on the output side so we have a start and end position
         // Then we will generate random obstacles in our matrix and ind a path through them, if there is no path we will regenerate the obstacles and try again.
         // Contants
-        private const int cellSize = 13;
+        private const int cellSize = 11;
         public const int cellNodeSize = 10;
-        private const int obstacleCount = 10; // The higher this is the more likely we are to fail but the better our path should be.
+        private const int obstacleCount = 30; // The higher this is the more likely we are to fail but the better our path should be.
         public enum CellSide
         {
             YMinus, // Up
+            XPlus, // Right
             YPlus, // Down
             XMinus, // Left
-            XPlus // Right
         };
         // Properties
         private Random rand;
@@ -55,10 +55,12 @@ namespace Grade12Game
         private int cellEndIndex;
         private int nextCellX;
         private int nextCellY;
+        private int currentStep = 0;
         // TODO: Refine how we store this
         private GameObject nonPathCell;
+        private GameObject pathCell;
         // World Construtor
-        public World(GameObject nonPathCell)
+        public World(GameObject nonPathCell, GameObject pathCell)
         {
             // Set Our Props
             rand = new Random();
@@ -66,28 +68,31 @@ namespace Grade12Game
             turnsTillNextCell = 0;
             lastSide = CellSide.XMinus;
             nextSide = getNextCellSide(lastSide);
-            cellEndIndex = 7;
+            cellEndIndex = cellSize/2;
             nextCellX = 0;
             nextCellY = 0;
             this.nonPathCell = nonPathCell;
+            this.pathCell = pathCell;
         }
         // Get Next Cell Side
         private CellSide getNextCellSide(CellSide cellSide)
         {
-            // Should create a clockwise spiral
+            currentStep++;
+            // TODO: Handle Turning
+            // Corner Behaviour
             switch (cellSide)
             {
                 case CellSide.YMinus:
                     return CellSide.XPlus;
+                case CellSide.XPlus:
+                    return CellSide.YPlus;
                 case CellSide.YPlus:
                     return CellSide.XMinus;
                 case CellSide.XMinus:
                     return CellSide.YMinus;
-                case CellSide.XPlus:
-                    return CellSide.YPlus;
-                default:
-                    throw new Exception("Impossible Error");
             }
+            // We should never hit here
+            throw new Exception("Impossible Error");
         }
         // Start Turn
         public void advanceTurn()
@@ -99,15 +104,15 @@ namespace Grade12Game
                 switch (lastSide)
                 {
                     case CellSide.YMinus:
-                        startPosition = new Vector2(cellEndIndex, 0);
-                        break;
-                    case CellSide.YPlus:
-                        startPosition = new Vector2(cellEndIndex, cellSize - 1);
-                        break;
-                    case CellSide.XMinus:
-                        startPosition = new Vector2(0, cellEndIndex);
+                        startPosition = new Vector2(cellEndIndex, cellSize-1);
                         break;
                     case CellSide.XPlus:
+                        startPosition = new Vector2(0, cellEndIndex);
+                        break;
+                    case CellSide.YPlus:
+                        startPosition = new Vector2(cellEndIndex, 0);
+                        break;
+                    case CellSide.XMinus:
                         startPosition = new Vector2(cellSize - 1, cellEndIndex);
                         break;
                     default:
@@ -116,10 +121,28 @@ namespace Grade12Game
                 // Generate The Cell
                 Cell cell = genCell(startPosition, nextSide, nextCellX, nextCellY);
                 world.Add(cell);
-                // TODO: Increment The Next Cell Position
+                // Increment The Next Cell Position
+                switch (nextSide)
+                {
+                    case CellSide.YMinus:
+                        nextCellY--;
+                        break;
+                    case CellSide.XPlus:
+                        nextCellX++;
+                        break;
+                    case CellSide.YPlus:
+                        nextCellY++;
+                        break;
+                    case CellSide.XMinus:
+                        nextCellX--;
+                        break;
+                    default:
+                        throw new Exception("Impossible Error");
+                }
                 // Setup for next
                 lastSide = nextSide;
                 nextSide = getNextCellSide(nextSide);
+                turnsTillNextCell = 0;
             }
             // Decrement turn Count
             turnsTillNextCell--;
@@ -131,12 +154,12 @@ namespace Grade12Game
             {
                 case CellSide.YMinus:
                     return new Vector2(cellIndex, 0);
+                case CellSide.XPlus:
+                    return new Vector2(cellSize - 1, cellIndex);
                 case CellSide.YPlus:
                     return new Vector2(cellIndex, cellSize-1);
                 case CellSide.XMinus:
                     return new Vector2(0, cellIndex);
-                case CellSide.XPlus:
-                    return new Vector2(cellSize-1, cellIndex);
                 default:
                     // This code path is just here to satisfy type checker, will never be hit
                     return new Vector2(-1, -1);
@@ -162,38 +185,55 @@ namespace Grade12Game
                     }
                 }
                 // Choose A Random Position (Do Not Allow Corner Cells)
-                int endIndex = rand.Next(1, cellSize); // Should output a value of 1 to 11
+                int endIndex = rand.Next(1, cellSize/2);
+                switch (lastSide)
+                {
+                    case CellSide.YMinus:
+                    case CellSide.XMinus:
+                        endIndex += cellSize/2;
+                        break;
+                }
                 endIndex = 1;
                 cellEndIndex = endIndex;
                 Vector2 endPosition = makeExitCord(exitSide, endIndex);
+                // Add Obstacles in each corner
+                cellList[0][0].Walkable = false;
+                cellList[0][cellSize-1].Walkable = false;
+                cellList[cellSize-1][0].Walkable = false;
+                cellList[cellSize - 1][cellSize-1].Walkable = false;
                 // Generate Random Obstacles
                 for (int i = 0; i < obstacleCount; i++)
                 {
                     // Choose A Random Position
                     int obstacleX = rand.Next(0, cellSize);
                     int obstacleY = rand.Next(0, cellSize);
-                    if (obstacleX == startPosition.X || obstacleY == startPosition.Y)
-                    {
-                        i--;
-                        continue;
-                    }
-                    if (obstacleX == endPosition.X || obstacleY == endPosition.Y)
+                    if (
+                        
+                        (obstacleX == startPosition.X && obstacleY == startPosition.Y) ||
+                        (obstacleX == endPosition.X && obstacleY == endPosition.Y)
+                    )
                     {
                         i--;
                         continue;
                     }
                     cellList[obstacleX][obstacleY].Walkable = false;
+                    cellGrid[obstacleX, obstacleY] = 2;
                 }
                 // Solve Our PathFinding
                 Astar finder = new Astar(cellList);
                 path = finder.FindPath(startPosition, endPosition);
                 // TODO: Ensure We have reached the end
+                if (path == null) continue;
                 // Write to cell
-                for (int i = 0; i < path.Count; i++)
+                int pathCount = path.Count;
+                for (int i = 0; i < pathCount; i++)
                 {
                     Node node = path.Pop();
                     cellGrid[(int)node.Position.X, (int)node.Position.Y] = 0;
                 }
+                // Clear start Pos
+                cellGrid[(int)startPosition.X, (int)startPosition.Y] = 3;
+                cellGrid[(int)endPosition.X, (int)endPosition.Y] = 4;
             } while (path == null);
             // Return The cellGrid
             return new Cell(path, cellGrid, cellX, cellY);
@@ -205,8 +245,8 @@ namespace Grade12Game
             foreach (Cell cell in this.world)
             {
                 // Calculate The Cell World Position
-                int cellWorldX = cell.cellX * cellNodeSize * cellNodeSize;
-                int cellWorldY = cell.cellY * cellNodeSize * cellNodeSize;
+                int cellWorldX = cell.cellX * cellSize * cellNodeSize;
+                int cellWorldY = cell.cellY * cellSize * cellNodeSize;
                 // Render Each Cell Node
                 int[,] cellGrid = cell.cellGrid;
                 for (int x = 0; x < cellSize; x++)
@@ -218,11 +258,24 @@ namespace Grade12Game
                         switch (cellGrid[x,y])
                         {
                             case 0:
-                                // TODO: Render Path Cell
+                                pathCell.setPosition(new Vector3(localX, 0, localY));
+                                pathCell.Draw(cam, renderer);
                                 break;
                             case 1:
                                 nonPathCell.setPosition(new Vector3(localX, 0, localY));
                                 nonPathCell.Draw(cam, renderer);
+                                break;
+                            case 2:
+                                nonPathCell.setPosition(new Vector3(localX, -5, localY));
+                                nonPathCell.Draw(cam, renderer);
+                                break;
+                            case 3:
+                                pathCell.setPosition(new Vector3(localX, 5, localY));
+                                pathCell.Draw(cam, renderer);
+                                break;
+                            case 4:
+                                pathCell.setPosition(new Vector3(localX, -5, localY));
+                                pathCell.Draw(cam, renderer);
                                 break;
                             default:
                                 throw new Exception("Unknown Cell State");

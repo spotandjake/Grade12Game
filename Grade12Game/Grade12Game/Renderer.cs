@@ -73,9 +73,9 @@ namespace Grade12Game
                         Matrix.CreateRotationZ(rotation.Z)
                         // TODO: Our scale is no longer a float but a vector figure that out
                         *
-                        Matrix.CreateScale(scale) //Applys the scale
+                        Matrix.CreateScale(scale / 2) //Applys the scale
                         *
-                        Matrix.CreateWorld(position, Vector3.Forward, Vector3.Up); //Move the models position
+                        Matrix.CreateWorld(position+scale/2, Vector3.Forward, Vector3.Up); //Move the models position
                 }
             } else
             {
@@ -86,9 +86,9 @@ namespace Grade12Game
                         Matrix.CreateRotationZ(rotation.Z)
                         // TODO: Our scale is no longer a float but a vector figure that out
                         *
-                        Matrix.CreateScale(scale) //Applys the scale
+                        Matrix.CreateScale(scale/2) //Applys the scale
                         *
-                        Matrix.CreateWorld(position, Vector3.Forward, Vector3.Up); //Move the models position
+                        Matrix.CreateWorld(position + scale / 2, Vector3.Forward, Vector3.Up); //Move the models position
             }
             // TODO: Create Camera View Matrix
             Matrix view = Matrix.CreateTranslation(camPosition) *
@@ -107,11 +107,13 @@ namespace Grade12Game
                         effect.Projection = this.projection;
                         effect.EnableDefaultLighting();
                         // Look into this
+                        // TODO: let model take control of this
                         effect.SpecularColor = new Vector3(0.25f);
                         effect.SpecularPower = 16;
                     }
                 } else
                 {
+
                     foreach (BasicEffect effect in mesh.Effects)
                     {
                         effect.World = world;
@@ -119,6 +121,7 @@ namespace Grade12Game
                         effect.Projection = this.projection;
                         effect.EnableDefaultLighting();
                         // Look into this
+                        // TODO: let model take control of this
                         effect.SpecularColor = new Vector3(0.25f);
                         effect.SpecularPower = 16;
                     }

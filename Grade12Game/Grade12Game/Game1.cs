@@ -67,8 +67,14 @@ namespace Grade12Game
             Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
             this.cube = new GameObject(cubeModel, new Vector3(-10, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
             // Create our World
-            GameObject nonPathBlock = new GameObject(cubeModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-            this.world = new World(nonPathBlock);
+            GameObject nonPathBlock = new GameObject(cubeModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+            Model pathModel = Content.Load<Model>("Models/path"); //Loads your new model, point it towards your model
+            GameObject pathBlock = new GameObject(pathModel, new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+            this.world = new World(nonPathBlock, pathBlock);
+            this.world.advanceTurn();
+            this.world.advanceTurn();
+            this.world.advanceTurn();
+            this.world.advanceTurn();
             this.world.advanceTurn();
 
             // TODO: use this.Content to load your game content here

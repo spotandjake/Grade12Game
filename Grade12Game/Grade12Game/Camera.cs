@@ -37,6 +37,8 @@ namespace Grade12Game
             Vector3 velocity = new Vector3(0, 0, 0);
             velocity.X += (inputHandler.ForwardAxis * (float)Math.Sin(-this.rotation.Y) + inputHandler.SideAxis * -(float)Math.Cos(-this.rotation.Y));
             velocity.Z += (inputHandler.ForwardAxis * (float)Math.Cos(-this.rotation.Y) + inputHandler.SideAxis * (float)Math.Sin(-this.rotation.Y));
+
+            velocity.Y += inputHandler.VerticalAxis;
             // Set Position
             this.position.X += velocity.X;
             this.position.Y += velocity.Y;
