@@ -38,6 +38,7 @@ namespace Grade12Game
         {
             this.path = path;
             this.cellGrid = cellGrid;
+            this.cellObjects = cellObjects;
             this.cellX = cellX;
             this.cellY = cellY;
         }
@@ -73,7 +74,7 @@ namespace Grade12Game
         };
 
         // Properties
-        private CollisionSystem collision = new CollisionSystemSAP();
+        private CollisionSystem collision;
         private List<IGameObject> gameObjects;
         private Random rand;
         private List<Cell> world;
@@ -90,10 +91,11 @@ namespace Grade12Game
         private GameObject pathCell;
 
         // World Constructor
-        public WorldHandler(GameObject nonPathCell, GameObject pathCell)
-            : base(collisionSystem)
+        public WorldHandler(CollisionSystem collision, GameObject nonPathCell, GameObject pathCell)
+            : base(collision)
         {
             // Set Our Props
+            this.collision = collision;
             gameObjects = new List<IGameObject>();
             rand = new Random();
             world = new List<Cell>();
@@ -305,12 +307,13 @@ namespace Grade12Game
                     int localX = cellWorldX + x * cellNodeSize;
                     int localY = cellWorldY + y * cellNodeSize;
                     gameObject.setPosition(new Vector3(localX, -5, localY));
+                    // Set Props
                     // Add The GameObject
                     cellGameObjects[x, y] = gameObject;
                 }
             }
             // Return The cellGrid
-            return new Cell(path, cellGrid, cellX, cellY);
+            return new Cell(path, cellGrid, cellGameObjects, cellX, cellY);
         }
 
         // Add GameObject
@@ -319,7 +322,7 @@ namespace Grade12Game
             // Add GameObject to gameObject List
             gameObjects.Add(gameObject);
             // Add RigidBody To Collision World
-            collisionWorld.AddBody((RigidBody)gameObject);
+            this.AddBody((RigidBody)gameObject);
         }
 
         // Remove GameObject
@@ -328,11 +331,11 @@ namespace Grade12Game
             // Remove GameObject from gameObject List
             gameObjects.Remove(gameObject);
             // Remove RigidBody from Collision World
-            collisionWorld.RemoveBody((RigidBody)gameObject);
+            this.RemoveBody((RigidBody)gameObject);
         }
 
         // Add Cell
-        public void addWorldCell(Cell cell)
+        private void addWorldCell(Cell cell)
         {
             // Add The Cell
             world.Add(cell);
@@ -344,7 +347,10 @@ namespace Grade12Game
                     // Get The GameObject
                     IGameObject gameObject = cell.cellObjects[x, y];
                     // Add The GameObject
-                    collisionWorld.AddBody((RigidBody)gameObject);
+                    RigidBody r = (RigidBody)gameObject;
+                    r.AffectedByGravity = false;
+                    //r.IsStatic = true;
+                    this.AddBody(r);
                 }
             }
         }
@@ -353,11 +359,15 @@ namespace Grade12Game
         public void Update(GameTime gameTime, InputHandler input)
         {
             // TODO: Perform Wave Actions
+            foreach (IGameObject obj in gameObjects)
+            {
+                obj.Update(gameTime);
+            }
             // Update Physics
             float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (step > 1.0f / 100.0f)
                 step = 1.0f / 100.0f;
-            collisionWorld.Step(step, true);
+            this.Step(step * 10, true);
         }
 
         // Draw World
@@ -371,7 +381,7 @@ namespace Grade12Game
                 int cellWorldY = cell.cellY * cellSize * cellNodeSize;
                 // Render Each Cell Node
                 int[,] cellGrid = cell.cellGrid;
-                IGameObject cellGameObjects = cell.cellObjects;
+                IGameObject[,] cellGameObjects = cell.cellObjects;
                 for (int x = 0; x < cellSize; x++)
                 {
                     for (int y = 0; y < cellSize; y++)

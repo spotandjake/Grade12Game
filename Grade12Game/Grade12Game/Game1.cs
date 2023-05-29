@@ -100,7 +100,8 @@ namespace Grade12Game
                 new Vector3(10, 10, 10)
             );
             // Create Our World
-            this.world = new WorldHandler(nonPathBlock, pathBlock);
+            this.world = new WorldHandler(new CollisionSystemSAP(), nonPathBlock, pathBlock);
+            world.addGameObject(this.character);
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
@@ -127,15 +128,15 @@ namespace Grade12Game
             // Update Inputs
             this.inputHandler.Update(gameTime);
             // Handle Exit
-            if (this.inputHandler.IsExitDown)
+            if (this.inputHandler.isExitDown)
             {
                 this.Exit();
             }
             // TODO: Move this into world to be handled
             this.camera.Update(gameTime, inputHandler);
-            this.character.Update(gameTime);
+            //this.character.Update(gameTime);
             // Update World
-            this.camera.Update(gameTime, inputHandler);
+            this.world.Update(gameTime, inputHandler);
 
             // TODO: Add your update logic here
 
@@ -149,7 +150,7 @@ namespace Grade12Game
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            this.character.Draw(camera, renderer);
+            //this.character.Draw(camera, renderer);
             this.world.Draw(camera, renderer);
 
             // TODO: Add your drawing code here

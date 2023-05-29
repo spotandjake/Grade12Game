@@ -27,7 +27,7 @@ namespace Grade12Game
         public float YawAxis { get; private set; }
 
         // States
-        private bool isExitDown { get; private set; }
+        public bool isExitDown { get; private set; }
 
         // Constructor
         public InputHandler(PlayerIndex playerIndex)

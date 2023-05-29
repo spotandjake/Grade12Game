@@ -20,15 +20,25 @@ namespace Grade12Game
 {
     public interface IGameObject
     {
+        void setModel(Model model);
+        Model getModel();
+        void setPosition(Vector3 vector);
+        Vector3 getPosition();
+        void setRotation(Vector3 rot);
+        Vector3 getRotation();
+        void setScale(Vector3 scale);
+        Vector3 getScale();
+        AnimationPlayer getAnimationPlayer();
+        bool getHasBones();
+        void PlayAnimation(String Animation);
+        GameObject Clone(); // TODO Look into using a generic here
         void Update(GameTime gameTime);
         void Draw(Camera cam, Renderer renderer);
     }
 
-    public class GameObject : RigidBody, IGameObject, ICloneable
+    public class GameObject : RigidBody, IGameObject
     {
         // Internals
-        // TODO: Use RigidBody Position
-        private Vector3 position;
         private Vector3 rotation;
         private Vector3 scale;
         private Model model;
@@ -94,14 +104,12 @@ namespace Grade12Game
 
         public void setPosition(Vector3 position)
         {
-            // TODO: Use RigidBody Position
-            this.position = position;
+            this.Position = new JVector(position.X, position.Y, position.Z);
         }
 
         public Vector3 getPosition()
         {
-            // TODO: Use RigidBody Position
-            return this.position;
+            return new Vector3(this.Position.X, this.Position.Y, this.Position.Z);
         }
 
         public void setRotation(Vector3 rotation)
@@ -143,9 +151,11 @@ namespace Grade12Game
             }
         }
 
-        public object Clone()
+        public GameObject Clone()
         {
-            return this.MemberwiseClone();
+            // TODO: Look into cloning the model and shape
+            GameObject obj = new GameObject(this.model, this.Shape, this.getPosition(), this.rotation, this.scale);
+            return obj;
         }
 
         public void Draw(Camera cam, Renderer renderer)
