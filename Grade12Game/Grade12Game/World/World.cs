@@ -62,6 +62,7 @@ namespace Grade12Game
         private const int cellSize = 11;
         public const int cellNodeSize = 10;
         private const int obstacleCount = 30; // The higher this is the more likely we are to fail but the better our path should be.
+        private const int textYSize = 16;
 
         // TODO: I think the method we are using for sides has issues and makes things overcomplicated
 
@@ -85,13 +86,16 @@ namespace Grade12Game
         private int nextCellX;
         private int nextCellY;
         private int currentStep = 0;
+        private SpriteFont spriteFont;
+        // Settings
+        private bool debug;
 
         // TODO: Refine how we store this
         private GameObject nonPathCell;
         private GameObject pathCell;
 
         // World Constructor
-        public WorldHandler(CollisionSystem collision, GameObject nonPathCell, GameObject pathCell)
+        public WorldHandler(CollisionSystem collision, GameObject nonPathCell, GameObject pathCell, SpriteFont spriteFont)
             : base(collision)
         {
             // Set Our Props
@@ -103,8 +107,10 @@ namespace Grade12Game
             lastSide = CellSide.XMinus;
             nextSide = getNextCellSide(lastSide);
             cellEndIndex = cellSize / 2;
+            debug = true;
             nextCellX = 0;
             nextCellY = 0;
+            this.spriteFont = spriteFont;
             this.nonPathCell = nonPathCell;
             this.pathCell = pathCell;
         }
@@ -349,7 +355,7 @@ namespace Grade12Game
                     // Add The GameObject
                     RigidBody r = (RigidBody)gameObject;
                     r.AffectedByGravity = false;
-                    //r.IsStatic = true;
+                    r.IsStatic = true;
                     this.AddBody(r);
                 }
             }
@@ -369,10 +375,33 @@ namespace Grade12Game
                 step = 1.0f / 100.0f;
             this.Step(step * 10, true);
         }
-
-        // Draw World
-        public void Draw(Camera cam, Renderer renderer)
+        // Toggle Debug
+        public void toggleDebug()
         {
+            this.debug = !debug;
+        }
+        // Draw World
+        public void Draw(Camera cam, Renderer renderer, SpriteBatch spriteBatch)
+        {
+            // Render Debug Info
+            if (this.debug)
+            {
+                int currentY = 0;
+                spriteBatch.DrawString(spriteFont, "Garbage Collection:", new Vector2(0, currentY), Color.White);
+                spriteBatch.DrawString(spriteFont, "gen0: " + GC.CollectionCount(0).ToString(), new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(spriteFont, "gen1: " + GC.CollectionCount(1).ToString(), new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(spriteFont, "gen2: " + GC.CollectionCount(2).ToString(), new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(spriteFont, "Physics:", new Vector2(0, currentY += textYSize), Color.White);
+                double total = 0;
+
+                for (int i = 0; i < (int)Jitter.World.DebugType.Num; i++)
+                {
+                    total += this.DebugTimes[i];
+                }
+                spriteBatch.DrawString(spriteFont, "RigidBodys: "  + this.RigidBodies.Count.ToString(), new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(spriteFont, "TotalTime: " + total.ToString("0.00"), new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(spriteFont, "FrameRate: " + (1000.0d / total).ToString("0"), new Vector2(0, currentY += textYSize), Color.White);
+            }
             // Render The Cells In The World
             foreach (Cell cell in this.world)
             {

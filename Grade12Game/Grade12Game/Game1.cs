@@ -99,8 +99,10 @@ namespace Grade12Game
                 new Vector3(0, 0, 0),
                 new Vector3(10, 10, 10)
             );
+            // Load Our SpriteFont
+            SpriteFont spriteFont = Content.Load<SpriteFont>("Arial");
             // Create Our World
-            this.world = new WorldHandler(new CollisionSystemSAP(), nonPathBlock, pathBlock);
+            this.world = new WorldHandler(new CollisionSystemSAP(), nonPathBlock, pathBlock, spriteFont);
             world.addGameObject(this.character);
             this.world.advanceTurn();
             this.world.advanceTurn();
@@ -150,11 +152,14 @@ namespace Grade12Game
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            spriteBatch.Begin();
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             //this.character.Draw(camera, renderer);
-            this.world.Draw(camera, renderer);
+            this.world.Draw(camera, renderer, spriteBatch);
 
             // TODO: Add your drawing code here
-
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
