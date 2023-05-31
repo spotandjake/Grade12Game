@@ -32,20 +32,25 @@ namespace Grade12Game
         bool getHasBones();
         void PlayAnimation(String Animation);
         GameObject Clone(); // TODO Look into using a generic here
-        void Update(GameTime gameTime);
+        void Update(GameTime gameTime, World world, InputHandler inputHandler);
         void Draw(Camera cam, Renderer renderer);
     }
 
     public class GameObject : RigidBody, IGameObject
     {
         // Internals
-        private Vector3 rotation;
-        private Vector3 scale;
-        private Model model;
-        private SkinningData skinningData;
-        private AnimationPlayer animationPlayer;
-        private AnimationClip animationClip;
-        private bool hasBones;
+        protected Vector3 position
+        {
+            get { return new Vector3(this.Position.X, this.Position.Y, this.Position.Z); }
+            set { this.Position = new JVector(value.X, value.Y, value.Z); }
+        }
+        protected Vector3 rotation;
+        protected Vector3 scale;
+        protected Model model;
+        protected SkinningData skinningData;
+        protected AnimationPlayer animationPlayer;
+        protected AnimationClip animationClip;
+        protected bool hasBones;
 
         // Constructor
         public GameObject(
@@ -65,7 +70,7 @@ namespace Grade12Game
         }
 
         // Public Methods
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime, World world, InputHandler inputHandler)
         {
             // Update The AnimationPlayer
             if (this.animationClip != null)
@@ -104,12 +109,12 @@ namespace Grade12Game
 
         public void setPosition(Vector3 position)
         {
-            this.Position = new JVector(position.X, position.Y, position.Z);
+            this.position = position;
         }
 
         public Vector3 getPosition()
         {
-            return new Vector3(this.Position.X, this.Position.Y, this.Position.Z);
+            return this.position;
         }
 
         public void setRotation(Vector3 rotation)

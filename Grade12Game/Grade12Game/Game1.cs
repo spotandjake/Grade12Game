@@ -32,8 +32,6 @@ namespace Grade12Game
 
         // TODO: Move this into world to be handled
         Camera camera;
-
-        GameObject character;
         WorldHandler world;
 
         public Game1()
@@ -74,15 +72,24 @@ namespace Grade12Game
 
             Content.RootDirectory = "Content";
             Model characterModel = Content.Load<Model>("Models/dude"); //Loads your new model, point it towards your model
-            this.character = new GameObject(
+            GameObject randomPlayer = new GameObject(
                 characterModel,
                 shape,
                 new Vector3(0, 0, 0),
                 new Vector3(0, 0, 0),
                 new Vector3(1, 1, 1)
             );
-            this.character.PlayAnimation("Take 001");
+            randomPlayer.PlayAnimation("Take 001");
             Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
+            // Create Character
+            Character character = new Character(
+                characterModel,
+                shape,
+                new Vector3(0, 0, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 1, 1)
+            );
+            character.PlayAnimation("Take 001");
             // Create Our Block Templates
             GameObject nonPathBlock = new GameObject(
                 cubeModel,
@@ -103,7 +110,8 @@ namespace Grade12Game
             SpriteFont spriteFont = Content.Load<SpriteFont>("Arial");
             // Create Our World
             this.world = new WorldHandler(new CollisionSystemSAP(), nonPathBlock, pathBlock, spriteFont);
-            world.addGameObject(this.character);
+            world.addGameObject(randomPlayer);
+            world.addGameObject(character);
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
@@ -155,7 +163,6 @@ namespace Grade12Game
             spriteBatch.Begin();
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            //this.character.Draw(camera, renderer);
             this.world.Draw(camera, renderer, spriteBatch);
 
             // TODO: Add your drawing code here

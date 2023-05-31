@@ -367,7 +367,7 @@ namespace Grade12Game
             // TODO: Perform Wave Actions
             foreach (IGameObject obj in gameObjects)
             {
-                obj.Update(gameTime);
+                obj.Update(gameTime, this, input);
             }
             // Update Physics
             float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -415,36 +415,7 @@ namespace Grade12Game
                 {
                     for (int y = 0; y < cellSize; y++)
                     {
-                        // int localX = cellWorldX + x * cellNodeSize;
-                        // int localY = cellWorldY + y * cellNodeSize;
-                        // TODO: Render from the gameObject List
                         cellGameObjects[x, y].Draw(cam, renderer);
-                        // // Get The Cell State
-                        // switch (cellGrid[x, y])
-                        // {
-                        //     case 0:
-                        //         pathCell.setPosition(new Vector3(localX, 0, localY));
-                        //         pathCell.Draw(cam, renderer);
-                        //         break;
-                        //     case 1:
-                        //         nonPathCell.setPosition(new Vector3(localX, 0, localY));
-                        //         nonPathCell.Draw(cam, renderer);
-                        //         break;
-                        //     case 2:
-                        //         nonPathCell.setPosition(new Vector3(localX, -5, localY));
-                        //         nonPathCell.Draw(cam, renderer);
-                        //         break;
-                        //     case 3:
-                        //         pathCell.setPosition(new Vector3(localX, 5, localY));
-                        //         pathCell.Draw(cam, renderer);
-                        //         break;
-                        //     case 4:
-                        //         pathCell.setPosition(new Vector3(localX, -5, localY));
-                        //         pathCell.Draw(cam, renderer);
-                        //         break;
-                        //     default:
-                        //         throw new Exception("Unknown Cell State");
-                        // }
                     }
                 }
             }
