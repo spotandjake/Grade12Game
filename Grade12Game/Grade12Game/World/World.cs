@@ -379,10 +379,12 @@ namespace Grade12Game
             // Return The Path
         }
 
+        // TODO: Start Wave
+
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
         {
-            // TODO: Perform Wave Actions
+            // Call GameObject Updates
             foreach (IGameObject obj in gameObjects)
             {
                 obj.Update(gameTime, this, input);
@@ -438,7 +440,6 @@ namespace Grade12Game
                     Color.White
                 );
                 double total = 0;
-
                 for (int i = 0; i < (int)Jitter.World.DebugType.Num; i++)
                 {
                     total += this.DebugTimes[i];
@@ -458,6 +459,24 @@ namespace Grade12Game
                 spriteBatch.DrawString(
                     spriteFont,
                     "FrameRate: " + (1000.0d / total).ToString("0"),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Cam Info:",
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Position: " + Camera.getPosition().ToString(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Rotation: " + Camera.getRotation().ToString(),
                     new Vector2(0, currentY += textYSize),
                     Color.White
                 );
