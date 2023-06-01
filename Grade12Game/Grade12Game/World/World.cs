@@ -87,6 +87,7 @@ namespace Grade12Game
         private int nextCellY;
         private int currentStep = 0;
         private SpriteFont spriteFont;
+
         // Settings
         private bool debug;
 
@@ -95,7 +96,12 @@ namespace Grade12Game
         private GameObject pathCell;
 
         // World Constructor
-        public WorldHandler(CollisionSystem collision, GameObject nonPathCell, GameObject pathCell, SpriteFont spriteFont)
+        public WorldHandler(
+            CollisionSystem collision,
+            GameObject nonPathCell,
+            GameObject pathCell,
+            SpriteFont spriteFont
+        )
             : base(collision)
         {
             // Set Our Props
@@ -361,6 +367,18 @@ namespace Grade12Game
             }
         }
 
+        // Get World Path
+        public Stack<JVector> getWorldPath()
+        {
+            Stack<JVector> Path = new Stack<JVector>();
+            // Loop Through Cells
+            foreach (Cell cell in this.world)
+            {
+                // TODO: Loop Through Path
+            }
+            // Return The Path
+        }
+
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
         {
@@ -375,11 +393,13 @@ namespace Grade12Game
                 step = 1.0f / 100.0f;
             this.Step(step * 10, true);
         }
+
         // Toggle Debug
         public void toggleDebug()
         {
             this.debug = !debug;
         }
+
         // Draw World
         public void Draw(Camera cam, Renderer renderer, SpriteBatch spriteBatch)
         {
@@ -387,20 +407,60 @@ namespace Grade12Game
             if (this.debug)
             {
                 int currentY = 0;
-                spriteBatch.DrawString(spriteFont, "Garbage Collection:", new Vector2(0, currentY), Color.White);
-                spriteBatch.DrawString(spriteFont, "gen0: " + GC.CollectionCount(0).ToString(), new Vector2(0, currentY += textYSize), Color.White);
-                spriteBatch.DrawString(spriteFont, "gen1: " + GC.CollectionCount(1).ToString(), new Vector2(0, currentY += textYSize), Color.White);
-                spriteBatch.DrawString(spriteFont, "gen2: " + GC.CollectionCount(2).ToString(), new Vector2(0, currentY += textYSize), Color.White);
-                spriteBatch.DrawString(spriteFont, "Physics:", new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Garbage Collection:",
+                    new Vector2(0, currentY),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "gen0: " + GC.CollectionCount(0).ToString(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "gen1: " + GC.CollectionCount(1).ToString(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "gen2: " + GC.CollectionCount(2).ToString(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Physics:",
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
                 double total = 0;
 
                 for (int i = 0; i < (int)Jitter.World.DebugType.Num; i++)
                 {
                     total += this.DebugTimes[i];
                 }
-                spriteBatch.DrawString(spriteFont, "RigidBodys: "  + this.RigidBodies.Count.ToString(), new Vector2(0, currentY += textYSize), Color.White);
-                spriteBatch.DrawString(spriteFont, "TotalTime: " + total.ToString("0.00"), new Vector2(0, currentY += textYSize), Color.White);
-                spriteBatch.DrawString(spriteFont, "FrameRate: " + (1000.0d / total).ToString("0"), new Vector2(0, currentY += textYSize), Color.White);
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "RigidBodys: " + this.RigidBodies.Count.ToString(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "TotalTime: " + total.ToString("0.00"),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "FrameRate: " + (1000.0d / total).ToString("0"),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
             }
             // Render The Cells In The World
             foreach (Cell cell in this.world)
