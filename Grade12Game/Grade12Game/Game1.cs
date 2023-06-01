@@ -115,8 +115,6 @@ namespace Grade12Game
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
-            this.world.advanceTurn();
-            this.world.advanceTurn();
         }
 
         /// <summary>

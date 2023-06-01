@@ -28,27 +28,29 @@ namespace Grade12Game
             Vector3 rotation,
             Vector3 scale
             ) : base(model, shape, position, rotation, scale)
-        { }
+        {
+            this.AffectedByGravity = true;
+        }
         // My Character GameObjectt
         public override void Update(GameTime gameTime, World world, InputHandler inputHandler)
         {
             // Normalize for gameTime
-            //float time = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            //float speed = time / 10;
+            float time = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            float speed = time / 10;
             // Set Rotation
-            //this.rotation.Y -= MathHelper.ToRadians(inputHandler.PitchAxis * speed);
+            this.rotation.Y -= MathHelper.ToRadians(inputHandler.PitchAxis * speed);
             // Calc Velocity
-            //Vector3 velocity = new Vector3(0, 0, 0);
-            //velocity.X += (inputHandler.ForwardAxis * (float)Math.Sin(-this.rotation.Y) + inputHandler.SideAxis * -(float)Math.Cos(-this.rotation.Y));
-            //velocity.Z += (inputHandler.ForwardAxis * (float)Math.Cos(-this.rotation.Y) + inputHandler.SideAxis * (float)Math.Sin(-this.rotation.Y));
+            Vector3 velocity = new Vector3(0, 0, 0);
+            velocity.X += (inputHandler.ForwardAxis * (float)Math.Sin(-this.rotation.Y) + inputHandler.SideAxis * -(float)Math.Cos(-this.rotation.Y));
+            velocity.Z += (inputHandler.ForwardAxis * (float)Math.Cos(-this.rotation.Y) + inputHandler.SideAxis * (float)Math.Sin(-this.rotation.Y));
 
-            //velocity.Y += inputHandler.VerticalAxis;
+            velocity.Y += inputHandler.VerticalAxis;
             // Set Position
-            //Vector3 pos = this.getPosition();
-            //pos.X += velocity.X;
-            //pos.Y += velocity.Y;
-            //pos.Z += velocity.Z;
-            //this.setPosition(pos);
+            Vector3 pos = this.getPosition();
+            pos.X += velocity.X;
+            pos.Y += velocity.Y;
+            pos.Z += velocity.Z;
+            this.setPosition(pos);
             // Call basse update
             base.Update(gameTime, world, inputHandler);
         }

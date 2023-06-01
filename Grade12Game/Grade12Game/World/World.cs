@@ -22,14 +22,14 @@ namespace Grade12Game
     // Cell Struct
     struct Cell
     {
-        public readonly Stack<Node> path;
+        public readonly List<Node> path;
         public readonly int[,] cellGrid;
         public readonly IGameObject[,] cellObjects;
         public readonly int cellX;
         public readonly int cellY;
 
         public Cell(
-            Stack<Node> path,
+            List<Node> path,
             int[,] cellGrid,
             IGameObject[,] cellObjects,
             int cellX,
@@ -325,7 +325,7 @@ namespace Grade12Game
                 }
             }
             // Return The cellGrid
-            return new Cell(path, cellGrid, cellGameObjects, cellX, cellY);
+            return new Cell(path.ToList(), cellGrid, cellGameObjects, cellX, cellY);
         }
 
         // Add GameObject
@@ -368,15 +368,16 @@ namespace Grade12Game
         }
 
         // Get World Path
-        public Stack<JVector> getWorldPath()
+        public Stack<Vector2> getWorldPath()
         {
-            Stack<JVector> Path = new Stack<JVector>();
+            Stack<Vector2> Path = new Stack<Vector2>();
             // Loop Through Cells
             foreach (Cell cell in this.world)
             {
                 // TODO: Loop Through Path
             }
             // Return The Path
+            return Path;
         }
 
         // TODO: Start Wave
@@ -470,13 +471,13 @@ namespace Grade12Game
                 );
                 spriteBatch.DrawString(
                     spriteFont,
-                    "Position: " + Camera.getPosition().ToString(),
+                    "Position: " + cam.getPosition().ToString(),
                     new Vector2(0, currentY += textYSize),
                     Color.White
                 );
                 spriteBatch.DrawString(
                     spriteFont,
-                    "Rotation: " + Camera.getRotation().ToString(),
+                    "Rotation: " + cam.getRotation().ToString(),
                     new Vector2(0, currentY += textYSize),
                     Color.White
                 );
