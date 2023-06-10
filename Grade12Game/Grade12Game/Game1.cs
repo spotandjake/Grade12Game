@@ -54,7 +54,7 @@ namespace Grade12Game
                 GraphicsDevice.Viewport.Height,
                 farPlaneDistance
             );
-            this.camera = new Camera(new Vector3(0, -70, -50), new Vector3(0, 0, 0));
+            this.camera = new Camera(new Vector3(0, 70, -50), new Vector3(0, 0, 0));
             this.inputHandler = new InputHandler(PlayerIndex.One);
             // Physics Testing
             base.Initialize();
@@ -81,6 +81,19 @@ namespace Grade12Game
             );
             randomPlayer.PlayAnimation("Take 001");
             Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
+            // Load Our Tower Bases
+            Shape smallTowerShape = new BoxShape(5.0f, 20.0f, 5.0f);
+            Model smallTowerModel = Content.Load<Model>("Models/Turrets/smallTurret");
+            GameObject[] turretTypes = new GameObject[]
+            {
+                 new GameObject(
+                    smallTowerModel,
+                    smallTowerShape,
+                    new Vector3(0, 0, 0),
+                    new Vector3(-MathHelper.PiOver2, 0, 0),
+                    new Vector3(5, 5, 5)
+                )
+            };
             // Create Character
             Character character = new Character(
                 characterModel,
@@ -91,27 +104,27 @@ namespace Grade12Game
             );
             character.PlayAnimation("Take 001");
             // Create Our Block Templates
+            Shape pathShape = new BoxShape(20.0f, 20.0f, 20.0f);
             GameObject nonPathBlock = new GameObject(
                 cubeModel,
-                shape,
+                pathShape,
                 new Vector3(0, 0, 0),
                 new Vector3(0, 0, 0),
-                new Vector3(10, 10, 10)
+                new Vector3(20, 20, 20)
             );
             Model pathModel = Content.Load<Model>("Models/path"); //Loads your new model, point it towards your model
             GameObject pathBlock = new GameObject(
                 pathModel,
-                shape,
+                pathShape,
                 new Vector3(0, 0, 0),
                 new Vector3(0, 0, 0),
-                new Vector3(10, 10, 10)
+                new Vector3(20, 20, 20)
             );
             // Load Our SpriteFont
             SpriteFont spriteFont = Content.Load<SpriteFont>("Arial");
             // Create Our World
-            this.world = new WorldHandler(new CollisionSystemSAP(), nonPathBlock, pathBlock, spriteFont);
+            this.world = new WorldHandler(camera, new CollisionSystemSAP(), nonPathBlock, pathBlock, spriteFont, turretTypes);
             world.addGameObject(randomPlayer);
-            world.addGameObject(character);
             this.world.advanceTurn();
             this.world.advanceTurn();
             this.world.advanceTurn();
@@ -140,13 +153,10 @@ namespace Grade12Game
             {
                 this.Exit();
             }
-            // TODO: Move this into world to be handled
-            this.camera.Update(gameTime, inputHandler);
-            //this.character.Update(gameTime);
             // Update World
             this.world.Update(gameTime, inputHandler);
-
-            // TODO: Add your update logic here
+            // Write Old State
+            this.inputHandler.writeOldState();
 
             base.Update(gameTime);
         }
@@ -161,7 +171,7 @@ namespace Grade12Game
             spriteBatch.Begin();
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            this.world.Draw(camera, renderer, spriteBatch);
+            this.world.Draw(renderer, spriteBatch);
 
             // TODO: Add your drawing code here
             spriteBatch.End();

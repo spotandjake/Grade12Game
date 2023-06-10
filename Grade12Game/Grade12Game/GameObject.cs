@@ -72,6 +72,14 @@ namespace Grade12Game
         // Public Methods
         public virtual void Update(GameTime gameTime, World world, InputHandler inputHandler)
         {
+            // Fall Out Of World Detection
+            if (this.position.Y < -1000)
+            {
+                Vector3 pos = this.getPosition();
+                pos.Y = 100;
+                this.Force = new JVector(0);
+                this.position = pos;
+            }
             // Update The AnimationPlayer
             if (this.animationClip != null)
             {

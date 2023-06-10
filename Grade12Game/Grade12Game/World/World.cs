@@ -60,7 +60,7 @@ namespace Grade12Game
         // Then we will generate random obstacles in our matrix and ind a path through them, if there is no path we will regenerate the obstacles and try again.
         // Constants
         private const int cellSize = 11;
-        public const int cellNodeSize = 10;
+        public const int cellNodeSize = 20;
         private const int obstacleCount = 30; // The higher this is the more likely we are to fail but the better our path should be.
         private const int textYSize = 16;
 
@@ -75,6 +75,7 @@ namespace Grade12Game
         };
 
         // Properties
+        private Camera player;
         private CollisionSystem collision;
         private List<IGameObject> gameObjects;
         private Random rand;
@@ -87,6 +88,8 @@ namespace Grade12Game
         private int nextCellY;
         private int currentStep = 0;
         private SpriteFont spriteFont;
+        private int currentPlayerMoney = 100;
+        private GameObject[] towerTemplates;
 
         // Settings
         private bool debug;
@@ -97,14 +100,18 @@ namespace Grade12Game
 
         // World Constructor
         public WorldHandler(
+            Camera player,
             CollisionSystem collision,
             GameObject nonPathCell,
             GameObject pathCell,
-            SpriteFont spriteFont
+            SpriteFont spriteFont,
+            // TODO: Remap This To Towers from GameObject
+            GameObject[] towerTemplates
         )
             : base(collision)
         {
             // Set Our Props
+            this.player = player;
             this.collision = collision;
             gameObjects = new List<IGameObject>();
             rand = new Random();
@@ -119,6 +126,7 @@ namespace Grade12Game
             this.spriteFont = spriteFont;
             this.nonPathCell = nonPathCell;
             this.pathCell = pathCell;
+            this.towerTemplates = towerTemplates;
         }
 
         // Get Next Cell Side
@@ -385,6 +393,16 @@ namespace Grade12Game
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
         {
+            // Update Player
+            player.Update(gameTime, input);
+            // Spawn Turret
+            if (input.isSpawnTowerKeyPressed)
+            {
+                GameObject tower = towerTemplates[0].Clone();
+                tower.setPosition(player.getPosition());
+                this.addGameObject(tower);
+                Console.WriteLine("Spawn");
+            }
             // Call GameObject Updates
             foreach (IGameObject obj in gameObjects)
             {
@@ -404,7 +422,7 @@ namespace Grade12Game
         }
 
         // Draw World
-        public void Draw(Camera cam, Renderer renderer, SpriteBatch spriteBatch)
+        public void Draw(Renderer renderer, SpriteBatch spriteBatch)
         {
             // Render Debug Info
             if (this.debug)
@@ -471,13 +489,13 @@ namespace Grade12Game
                 );
                 spriteBatch.DrawString(
                     spriteFont,
-                    "Position: " + cam.getPosition().ToString(),
+                    "Position: " + player.getPosition().ToString(),
                     new Vector2(0, currentY += textYSize),
                     Color.White
                 );
                 spriteBatch.DrawString(
                     spriteFont,
-                    "Rotation: " + cam.getRotation().ToString(),
+                    "Rotation: " + player.getRotation().ToString(),
                     new Vector2(0, currentY += textYSize),
                     Color.White
                 );
@@ -495,14 +513,14 @@ namespace Grade12Game
                 {
                     for (int y = 0; y < cellSize; y++)
                     {
-                        cellGameObjects[x, y].Draw(cam, renderer);
+                        cellGameObjects[x, y].Draw(player, renderer);
                     }
                 }
             }
             // Render Wave Objects
             foreach (IGameObject obj in gameObjects)
             {
-                obj.Draw(cam, renderer);
+                obj.Draw(player, renderer);
             }
         }
     }

@@ -91,7 +91,7 @@ namespace Grade12Game
                         Matrix.CreateWorld(position + scale / 2, Vector3.Forward, Vector3.Up); //Move the models position
             }
             // TODO: Create Camera View Matrix
-            Matrix view = Matrix.CreateTranslation(camPosition) *
+            Matrix view = Matrix.CreateTranslation(camPosition*-1) *
                 Matrix.CreateRotationY(camRotation.Y) *
                 Matrix.CreateRotationX(-camRotation.X);
             // Draw Model

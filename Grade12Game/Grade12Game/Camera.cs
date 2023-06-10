@@ -40,9 +40,9 @@ namespace Grade12Game
 
             velocity.Y += inputHandler.VerticalAxis;
             // Set Position
-            this.position.X += velocity.X;
-            this.position.Y += velocity.Y;
-            this.position.Z += velocity.Z;
+            this.position.X -= velocity.X;
+            this.position.Y -= velocity.Y;
+            this.position.Z -= velocity.Z;
         }
         public void setPosition(Vector3 position)
         {

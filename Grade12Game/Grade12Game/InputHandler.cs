@@ -18,6 +18,8 @@ namespace Grade12Game
         private PlayerIndex playerIndex;
         private GamePadState oldPadState;
         private KeyboardState oldKeyState;
+        private GamePadState padState;
+        private KeyboardState keyState;
 
         // Axis
         public float ForwardAxis { get; private set; }
@@ -28,6 +30,7 @@ namespace Grade12Game
 
         // States
         public bool isExitDown { get; private set; }
+        public bool isSpawnTowerKeyPressed { get; private set; }
 
         // Constructor
         public InputHandler(PlayerIndex playerIndex)
@@ -39,8 +42,8 @@ namespace Grade12Game
         public void Update(GameTime gameTime)
         {
             // get Input State
-            GamePadState padState = GamePad.GetState(this.playerIndex);
-            KeyboardState keyState = Keyboard.GetState();
+            padState = GamePad.GetState(this.playerIndex);
+            keyState = Keyboard.GetState();
             // Handle Forward Axis
             this.ForwardAxis = padState.ThumbSticks.Left.Y;
             this.ForwardAxis += keyState.IsKeyDown(Keys.W) ? 1 : 0;
@@ -82,12 +85,22 @@ namespace Grade12Game
             if (this.YawAxis > 1)
                 this.YawAxis = 1;
             // Set States
+            // TODO: Map this onto controller
+            this.isSpawnTowerKeyPressed = isKeyPressed(Keys.F);
             // Allows the game to exit
             this.isExitDown =
                 padState.Buttons.Back == ButtonState.Pressed || keyState.IsKeyDown(Keys.Escape);
-            // set old data
-            this.oldPadState = padState;
-            this.oldKeyState = keyState;
+        }
+        // Write Old States
+        public void writeOldState()
+        {
+            this.oldPadState = this.padState;
+            this.oldKeyState = this.keyState;
+        }
+        // Mehods
+        public bool isKeyPressed(Keys key)
+        {
+            return this.keyState.IsKeyDown(key) && !this.oldKeyState.IsKeyDown(key);
         }
 
         public void setPlayerIndex(PlayerIndex playerIndex)
