@@ -30,7 +30,9 @@ namespace Grade12Game
 
         // States
         public bool isExitDown { get; private set; }
-        public bool isSpawnTowerKeyPressed { get; private set; }
+        public bool isNumber1KeyPressed { get; private set; }
+        public bool isNumber2KeyPressed { get; private set; }
+        public bool isNumber3KeyPressed { get; private set; }
 
         // Constructor
         public InputHandler(PlayerIndex playerIndex)
@@ -86,7 +88,9 @@ namespace Grade12Game
                 this.YawAxis = 1;
             // Set States
             // TODO: Map this onto controller
-            this.isSpawnTowerKeyPressed = isKeyPressed(Keys.F);
+            this.isNumber1KeyPressed = isKeyPressed(Keys.D1);
+            this.isNumber2KeyPressed = isKeyPressed(Keys.D2);
+            this.isNumber3KeyPressed = isKeyPressed(Keys.D3);
             // Allows the game to exit
             this.isExitDown =
                 padState.Buttons.Back == ButtonState.Pressed || keyState.IsKeyDown(Keys.Escape);

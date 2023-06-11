@@ -18,7 +18,7 @@ using Jitter.LinearMath;
 
 namespace Grade12Game
 {
-    public interface IGameObject
+    interface IGameObject
     {
         void setModel(Model model);
         Model getModel();
@@ -31,12 +31,12 @@ namespace Grade12Game
         AnimationPlayer getAnimationPlayer();
         bool getHasBones();
         void PlayAnimation(String Animation);
-        GameObject Clone(); // TODO Look into using a generic here
-        void Update(GameTime gameTime, World world, InputHandler inputHandler);
+        IGameObject Clone(); // TODO Look into using a generic here
+        void Update(GameTime gameTime, WorldHandler world, InputHandler inputHandler);
         void Draw(Camera cam, Renderer renderer);
     }
 
-    public class GameObject : RigidBody, IGameObject
+    class GameObject : RigidBody, IGameObject
     {
         // Internals
         protected Vector3 position
@@ -70,8 +70,9 @@ namespace Grade12Game
         }
 
         // Public Methods
-        public virtual void Update(GameTime gameTime, World world, InputHandler inputHandler)
+        public virtual void Update(GameTime gameTime, WorldHandler world, InputHandler inputHandler)
         {
+            this.setRotation(this.rotation);
             // Fall Out Of World Detection
             if (this.position.Y < -1000)
             {
@@ -128,8 +129,8 @@ namespace Grade12Game
         public void setRotation(Vector3 rotation)
         {
             this.rotation = rotation;
+            this.Orientation = JMatrix.CreateFromYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
         }
-
         public Vector3 getRotation()
         {
             return this.rotation;
@@ -164,10 +165,14 @@ namespace Grade12Game
             }
         }
 
-        public GameObject Clone()
+        public virtual IGameObject Clone()
         {
             // TODO: Look into cloning the model and shape
             GameObject obj = new GameObject(this.model, this.Shape, this.getPosition(), this.rotation, this.scale);
+            obj.Force = this.Force;
+            obj.Orientation = this.Orientation;
+            obj.IsStatic = this.IsStatic;
+            obj.AffectedByGravity = this.AffectedByGravity;
             return obj;
         }
 

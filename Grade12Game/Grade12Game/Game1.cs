@@ -66,7 +66,7 @@ namespace Grade12Game
         /// </summary>
         protected override void LoadContent()
         {
-            Shape shape = new BoxShape(1.0f, 2.0f, 3.0f);
+            Shape shape = new BoxShape(1.0f, 20.0f, 3.0f);
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -75,34 +75,56 @@ namespace Grade12Game
             GameObject randomPlayer = new GameObject(
                 characterModel,
                 shape,
-                new Vector3(0, 0, 0),
+                new Vector3(0, 90, 0),
                 new Vector3(0, 0, 0),
                 new Vector3(1, 1, 1)
             );
             randomPlayer.PlayAnimation("Take 001");
             Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
             // Load Our Tower Bases
-            Shape smallTowerShape = new BoxShape(5.0f, 20.0f, 5.0f);
+            Shape smallTowerShape = new BoxShape(15.0f, 15.0f, 15.0f);
             Model smallTowerModel = Content.Load<Model>("Models/Turrets/smallTurret");
-            GameObject[] turretTypes = new GameObject[]
+            Shape mediumTowerShape = new BoxShape(15.0f, 15.0f, 15.0f);
+            Model mediumTowerModel = Content.Load<Model>("Models/Turrets/mediumTurret");
+            Shape largeTowerShape = new BoxShape(15.0f, 15.0f, 15.0f);
+            Model largeTowerModel = Content.Load<Model>("Models/Turrets/largeTurret");
+            IGameObject[] turretTypes = new IGameObject[]
             {
-                 new GameObject(
+                 new SmallTurret(
                     smallTowerModel,
                     smallTowerShape,
                     new Vector3(0, 0, 0),
-                    new Vector3(-MathHelper.PiOver2, 0, 0),
+                    new Vector3(0, -MathHelper.PiOver2, 0),
+                    new Vector3(5, 5, 5)
+                ),
+                new MediumTurret(
+                    mediumTowerModel,
+                    mediumTowerShape,
+                    new Vector3(0, 0, 0),
+                    new Vector3(0, -MathHelper.PiOver2, 0),
+                    new Vector3(5, 5, 5)
+                ),
+                new LargeTurret(
+                    largeTowerModel,
+                    largeTowerShape,
+                    new Vector3(0, 0, 0),
+                    new Vector3(0, -MathHelper.PiOver2, 0),
                     new Vector3(5, 5, 5)
                 )
             };
-            // Create Character
-            Character character = new Character(
-                characterModel,
-                shape,
+            // Load Our Projectile
+            Shape projectileShape = new BoxShape(2.0f, 2.0f, 2.0f);
+            Model projectileModel = Content.Load<Model>("Models/Projectile");
+            Projectile projectile = new Projectile(
+                projectileModel,
+                projectileShape,
                 new Vector3(0, 0, 0),
                 new Vector3(0, 0, 0),
-                new Vector3(1, 1, 1)
+                new Vector3(2, 2, 2),
+                0,
+                10000000
             );
-            character.PlayAnimation("Take 001");
+            projectile.AffectedByGravity = false;
             // Create Our Block Templates
             Shape pathShape = new BoxShape(20.0f, 20.0f, 20.0f);
             GameObject nonPathBlock = new GameObject(
@@ -123,7 +145,15 @@ namespace Grade12Game
             // Load Our SpriteFont
             SpriteFont spriteFont = Content.Load<SpriteFont>("Arial");
             // Create Our World
-            this.world = new WorldHandler(camera, new CollisionSystemSAP(), nonPathBlock, pathBlock, spriteFont, turretTypes);
+            this.world = new WorldHandler(
+                camera,
+                new CollisionSystemSAP(),
+                nonPathBlock,
+                pathBlock,
+                spriteFont,
+                turretTypes,
+                projectile
+            );
             world.addGameObject(randomPlayer);
             this.world.advanceTurn();
             this.world.advanceTurn();

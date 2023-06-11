@@ -45,7 +45,7 @@ namespace Grade12Game
     }
 
     // World Class
-    public class WorldHandler : World
+    class WorldHandler : World
     {
         // This Class Holds All Of The Data For Generating And Handling Our World
         // Our world is split up into square chunks and will generate in a swirl
@@ -75,10 +75,11 @@ namespace Grade12Game
         };
 
         // Properties
-        private Camera player;
+        public readonly Random rand;
+        // TODO: set this to private
+        public Camera player;
         private CollisionSystem collision;
         private List<IGameObject> gameObjects;
-        private Random rand;
         private List<Cell> world;
         private int turnsTillNextCell;
         private CellSide lastSide;
@@ -88,8 +89,9 @@ namespace Grade12Game
         private int nextCellY;
         private int currentStep = 0;
         private SpriteFont spriteFont;
-        private int currentPlayerMoney = 100;
-        private GameObject[] towerTemplates;
+        private IGameObject[] towerTemplates;
+
+        public readonly Projectile projectile;
 
         // Settings
         private bool debug;
@@ -106,7 +108,8 @@ namespace Grade12Game
             GameObject pathCell,
             SpriteFont spriteFont,
             // TODO: Remap This To Towers from GameObject
-            GameObject[] towerTemplates
+            IGameObject[] towerTemplates,
+            Projectile projectile
         )
             : base(collision)
         {
@@ -127,6 +130,7 @@ namespace Grade12Game
             this.nonPathCell = nonPathCell;
             this.pathCell = pathCell;
             this.towerTemplates = towerTemplates;
+            this.projectile = projectile;
         }
 
         // Get Next Cell Side
@@ -396,15 +400,27 @@ namespace Grade12Game
             // Update Player
             player.Update(gameTime, input);
             // Spawn Turret
-            if (input.isSpawnTowerKeyPressed)
+            if (input.isNumber1KeyPressed)
             {
-                GameObject tower = towerTemplates[0].Clone();
+                IGameObject tower = towerTemplates[0].Clone();
                 tower.setPosition(player.getPosition());
                 this.addGameObject(tower);
-                Console.WriteLine("Spawn");
+            }
+            if (input.isNumber2KeyPressed)
+            {
+                IGameObject tower = towerTemplates[1].Clone();
+                tower.setPosition(player.getPosition());
+                this.addGameObject(tower);
+            }
+            if (input.isNumber3KeyPressed)
+            {
+                IGameObject tower = towerTemplates[2].Clone();
+                tower.setPosition(player.getPosition());
+                this.addGameObject(tower);
             }
             // Call GameObject Updates
-            foreach (IGameObject obj in gameObjects)
+            List<IGameObject> tempGameOjects = new List<IGameObject>(gameObjects);
+            foreach (IGameObject obj in tempGameOjects)
             {
                 obj.Update(gameTime, this, input);
             }

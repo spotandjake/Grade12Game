@@ -12,7 +12,7 @@ using SkinnedModel;
 
 namespace Grade12Game
 {
-    public class Renderer : Microsoft.Xna.Framework.Game
+    class Renderer : Microsoft.Xna.Framework.Game
     {
         // Internals
         private int width;
@@ -52,7 +52,6 @@ namespace Grade12Game
             // Get Our Object Resources
             Model model = gameObject.getModel();
             Vector3 position = gameObject.getPosition();
-            Vector3 rotation = gameObject.getRotation();
             Vector3 scale = gameObject.getScale();
             AnimationPlayer animationPlayer = gameObject.getAnimationPlayer();
             bool hasBones = gameObject.getHasBones();
@@ -66,11 +65,13 @@ namespace Grade12Game
                 {
                     // Apply Model Transforms
                     bones[i] *=
-                        // TODO: I think we can do the rotation in one line
-                        Matrix.CreateRotationX(rotation.X) //Computes the rotation
-                        *
-                        Matrix.CreateRotationY(rotation.Y) *
-                        Matrix.CreateRotationZ(rotation.Z)
+                       // TODO: I think we can do the rotation in one line
+                       new Matrix(
+                            gameObject.Orientation.M11, gameObject.Orientation.M12, gameObject.Orientation.M13, 0.0f,
+                            gameObject.Orientation.M21, gameObject.Orientation.M22, gameObject.Orientation.M23, 0.0f,
+                            gameObject.Orientation.M31, gameObject.Orientation.M32, gameObject.Orientation.M33, 0.0f,
+                            0.0f, 0.0f, 0.0f, 1.0f
+                        )
                         // TODO: Our scale is no longer a float but a vector figure that out
                         *
                         Matrix.CreateScale(scale / 2) //Applys the scale
@@ -79,16 +80,14 @@ namespace Grade12Game
                 }
             } else
             {
-                world = // TODO: I think we can do the rotation in one line
-                        Matrix.CreateRotationX(rotation.X) //Computes the rotation
-                        *
-                        Matrix.CreateRotationY(rotation.Y) *
-                        Matrix.CreateRotationZ(rotation.Z)
-                        // TODO: Our scale is no longer a float but a vector figure that out
-                        *
-                        Matrix.CreateScale(scale/2) //Applys the scale
-                        *
-                        Matrix.CreateWorld(position + scale / 2, Vector3.Forward, Vector3.Up); //Move the models position
+                world = new Matrix(
+                    gameObject.Orientation.M11, gameObject.Orientation.M12, gameObject.Orientation.M13, 0.0f,
+                    gameObject.Orientation.M21, gameObject.Orientation.M22, gameObject.Orientation.M23, 0.0f,
+                    gameObject.Orientation.M31, gameObject.Orientation.M32, gameObject.Orientation.M33, 0.0f,
+                    0.0f, 0.0f, 0.0f, 1.0f
+                );
+                world *= Matrix.CreateScale(scale / 2);
+                world.Translation = position + scale / 2;
             }
             // TODO: Create Camera View Matrix
             Matrix view = Matrix.CreateTranslation(camPosition*-1) *
