@@ -22,14 +22,14 @@ namespace Grade12Game
     // Cell Struct
     struct Cell
     {
-        public readonly List<Node> path;
+        public readonly List<Vector3> path;
         public readonly int[,] cellGrid;
         public readonly IGameObject[,] cellObjects;
         public readonly int cellX;
         public readonly int cellY;
 
         public Cell(
-            List<Node> path,
+            List<Vector3> path,
             int[,] cellGrid,
             IGameObject[,] cellObjects,
             int cellX,
@@ -64,7 +64,7 @@ namespace Grade12Game
         private const int obstacleCount = 30; // The higher this is the more likely we are to fail but the better our path should be.
         private const int textYSize = 16;
 
-        // TODO: I think the method we are using for sides has issues and makes things overcomplicated
+        //  I think the method we are using for sides has issues and makes things overcomplicated
 
         public enum CellSide
         {
@@ -76,10 +76,13 @@ namespace Grade12Game
 
         // Properties
         public readonly Random rand;
+        private float difficulty;
+        private int level;
         // TODO: set this to private
         public Camera player;
         private CollisionSystem collision;
         private List<IGameObject> gameObjects;
+        private List<Projectile> freeProjectiles;
         private List<Cell> world;
         private int turnsTillNextCell;
         private CellSide lastSide;
@@ -90,6 +93,7 @@ namespace Grade12Game
         private int currentStep = 0;
         private SpriteFont spriteFont;
         private IGameObject[] towerTemplates;
+        private EnemyType[] enemyTemplates;
 
         public readonly Projectile projectile;
 
@@ -109,14 +113,18 @@ namespace Grade12Game
             SpriteFont spriteFont,
             // TODO: Remap This To Towers from GameObject
             IGameObject[] towerTemplates,
-            Projectile projectile
+            Projectile projectile,
+            EnemyType[] enemyTemplates
         )
             : base(collision)
         {
             // Set Our Props
             this.player = player;
+            this.difficulty = 0;
+            this.level = 0;
             this.collision = collision;
             gameObjects = new List<IGameObject>();
+            freeProjectiles = new List<Projectile>();
             rand = new Random();
             world = new List<Cell>();
             turnsTillNextCell = 0;
@@ -131,7 +139,9 @@ namespace Grade12Game
             this.pathCell = pathCell;
             this.towerTemplates = towerTemplates;
             this.projectile = projectile;
+            this.enemyTemplates = enemyTemplates;
         }
+        // TODO: Rewrite the entire world gen bassically, relating to what side to spawn on
 
         // Get Next Cell Side
         private CellSide getNextCellSide(CellSide cellSide)
@@ -231,7 +241,7 @@ namespace Grade12Game
         private Cell genCell(Vector2 startPosition, CellSide exitSide, int cellX, int cellY)
         {
             int[,] cellGrid = new int[cellSize, cellSize];
-            Stack<Node> path;
+            List<Vector3> cellPath = new List<Vector3>();
             do
             {
                 // Createte The Array We Are Storing This In
@@ -282,7 +292,7 @@ namespace Grade12Game
                 }
                 // Solve Our PathFinding
                 Astar finder = new Astar(cellList);
-                path = finder.FindPath(startPosition, endPosition);
+                Stack<Node> path = finder.FindPath(startPosition, endPosition);
                 // TODO: Ensure We have reached the end
                 if (path == null)
                     continue;
@@ -291,12 +301,22 @@ namespace Grade12Game
                 for (int i = 0; i < pathCount; i++)
                 {
                     Node node = path.Pop();
+                    // Calculate Node Positon In WOrld
+                    float nodeWorldX = cellX * cellSize * cellNodeSize + node.Position.X * cellNodeSize;
+                    float nodeWorldY = cellY * cellSize * cellNodeSize + node.Position.Y * cellNodeSize;
+                    Vector3 pos = new Vector3(
+                        nodeWorldX + cellNodeSize / 2,
+                        0,
+                        nodeWorldY+cellNodeSize/2
+                    );
+                    // Write Position
+                    cellPath.Add(pos);
                     cellGrid[(int)node.Position.X, (int)node.Position.Y] = 0;
                 }
                 // Clear start Pos
                 cellGrid[(int)startPosition.X, (int)startPosition.Y] = 3;
                 cellGrid[(int)endPosition.X, (int)endPosition.Y] = 4;
-            } while (path == null);
+            } while (cellPath.Count == 0);
             // Build Our Cell GameObjects
             IGameObject[,] cellGameObjects = new IGameObject[cellSize, cellSize];
             int cellWorldX = cellX * cellSize * cellNodeSize;
@@ -332,12 +352,28 @@ namespace Grade12Game
                     int localY = cellWorldY + y * cellNodeSize;
                     gameObject.setPosition(new Vector3(localX, -5, localY));
                     // Set Props
+                    if (cellGrid[x, y] == 3)
+                    {
+                        Vector3 pos = gameObject.getPosition();
+                        pos.Y = 0;
+                        gameObject.setPosition(pos);
+                    }
                     // Add The GameObject
                     cellGameObjects[x, y] = gameObject;
                 }
             }
             // Return The cellGrid
-            return new Cell(path.ToList(), cellGrid, cellGameObjects, cellX, cellY);
+            return new Cell(cellPath, cellGrid, cellGameObjects, cellX, cellY);
+        }
+
+        // getGameObjects
+        public List<IGameObject> getGameObjects() {
+            return this.gameObjects;
+        }
+
+        public bool hasGameObject(IGameObject gameObject)
+        {
+            return this.gameObjects.Contains(gameObject);
         }
 
         // Add GameObject
@@ -356,6 +392,49 @@ namespace Grade12Game
             gameObjects.Remove(gameObject);
             // Remove RigidBody from Collision World
             this.RemoveBody((RigidBody)gameObject);
+        }
+
+        public List<Enemy> getEnemies()
+        {
+            List<Enemy> e = new List<Enemy>();
+            foreach (IGameObject enemy in this.gameObjects)
+            {
+                if (enemy is Enemy)
+                {
+                    e.Add((Enemy)enemy);
+                }
+            }
+            return e;
+        }
+        // Handle Projectile
+        public Projectile spawnProjetile()
+        {
+            // Check for free Projectiles
+            if (freeProjectiles.Count > 0)
+            {
+                // Dequeue
+                Projectile proj = freeProjectiles[0];
+                freeProjectiles.RemoveAt(0);
+                // Add To Scene
+                gameObjects.Add(proj);
+                // Return
+                return proj;
+            }
+            else
+            {
+                Projectile proj = (Projectile)projectile.Clone();
+                // Add To World
+                this.addGameObject(proj);
+                // Return
+                return proj;
+            }
+        }
+        public void removeProjectile(Projectile gameObject)
+        {
+            // Remove From gameObjects, Note: We do not remove from physics scene
+            gameObjects.Remove(gameObject);
+            // Add To freeProjectiles
+            this.freeProjectiles.Add(gameObject);
         }
 
         // Add Cell
@@ -380,19 +459,78 @@ namespace Grade12Game
         }
 
         // Get World Path
-        public Stack<Vector2> getWorldPath()
+        public Stack<Vector3> getWorldPath()
         {
-            Stack<Vector2> Path = new Stack<Vector2>();
+            Stack<Vector3> Path = new Stack<Vector3>();
             // Loop Through Cells
+            //for (int i = this.world.Count-1; i >= 0; i--)
+            //{
+            //    foreach (Vector3 n in this.world[i].path)
+            //    {
+            //        Path.Push(n);
+            //    }
+            //}
             foreach (Cell cell in this.world)
             {
-                // TODO: Loop Through Path
+                foreach (Vector3 n in cell.path)
+                {
+                    Path.Push(n);
+                }
             }
             // Return The Path
             return Path;
         }
 
-        // TODO: Start Wave
+        public Stack<T> cloneStack<T>(Stack<T> original)
+        {
+            T[] arr = new T[original.Count];
+            original.CopyTo(arr, 0);
+            Array.Reverse(arr);
+            return new Stack<T>(arr);
+        }
+
+        // Start Wave
+        public void startWave()
+        {
+            // Update Level and difficulty
+            this.level++;
+            // TODO: Change how we calculate difficulty
+            this.difficulty++;
+            // Spawn New World Item
+            Stack<Vector3> currentWorldPath = getWorldPath();
+
+            // TODO: Create Enemys
+            float waveDifficulty = this.difficulty;
+            int stepsUntilSpawn = 16;
+            while (waveDifficulty > 0) {
+                // Filter Spawning
+                EnemyType[] validEnemyTypes = enemyTemplates.Where(enemyType => enemyType.difficulty <= waveDifficulty).ToArray();
+                // Do Not Get Stuck In Infinite Loop If Somehow There Are No Valid Enemies
+                if (validEnemyTypes.Length == 0) break;
+                // Choose To Spawn A Random Enemy
+                EnemyType choosenEnemy = validEnemyTypes[this.rand.Next(validEnemyTypes.Length)];
+                // Spawn Enemy
+                Enemy enemy = new Enemy(
+                    choosenEnemy.model,
+                    choosenEnemy.shape,
+                    new Vector3(0, 20, 0),
+                    choosenEnemy.rotation,
+                    choosenEnemy.scale,
+                    stepsUntilSpawn,
+                    cloneStack(currentWorldPath),
+                    cloneStack(currentWorldPath),
+                    choosenEnemy.speed,
+                    choosenEnemy.health
+                );
+                enemy.setIsActive(false);
+                // Add Enemy To World
+                this.addGameObject(enemy);
+                // Remove Difficulty
+                waveDifficulty -= choosenEnemy.difficulty;
+                // Consider More Steps Until Spawn
+                stepsUntilSpawn += 30;
+            }
+        }
 
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
@@ -424,6 +562,8 @@ namespace Grade12Game
             {
                 obj.Update(gameTime, this, input);
             }
+            // TODO: Map To KeyBind
+            if (getEnemies().Count == 0) this.startWave();
             // Update Physics
             float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (step > 1.0f / 100.0f)
@@ -536,7 +676,8 @@ namespace Grade12Game
             // Render Wave Objects
             foreach (IGameObject obj in gameObjects)
             {
-                obj.Draw(player, renderer);
+                if (obj.getIsActive())
+                    obj.Draw(player, renderer);
             }
         }
     }

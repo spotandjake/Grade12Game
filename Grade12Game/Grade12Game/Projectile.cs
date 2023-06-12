@@ -19,17 +19,23 @@ namespace Grade12Game
 {
     class Projectile : GameObject
     {
+        private const float hitDistance = 10;
+
         private long startTick;
         private long lifeTime;
+
+        private int damage;
         public Projectile(
             Model model,
             Shape shape,
             Vector3 position,
             Vector3 rotation,
             Vector3 scale,
+            int damage,
             long startTick,
             long lifeTime
         ) : base(model, shape, position, rotation, scale) {
+            this.damage = damage;
             this.startTick = startTick;
             this.lifeTime = lifeTime;
         }
@@ -44,16 +50,29 @@ namespace Grade12Game
            // Remove after tick Count
            if (gameTime.TotalGameTime.Ticks-startTick >= this.lifeTime)
             {
-                world.removeGameObject(this);
+                world.removeProjectile(this);
             }
-            // Call Base Update
-            base.Update(gameTime, world, inputHandler);
+           // Do Damage
+           foreach (Enemy e in world.getEnemies())
+            {
+                // TODO: Use Collision Data
+                // Check if we are touching
+                Vector3 diff = e.getPosition() - position;
+                // TODO: We would prefer to use LengthSquared
+                if (diff.Length() <= hitDistance)
+                {
+                    e.DoDamage(this.damage);
+                    world.removeProjectile(this);
+                }
+            }
+           // Call Base Update
+           base.Update(gameTime, world, inputHandler);
         }
 
         public override IGameObject Clone()
         {
             // TODO: Look into cloning the model and shape
-            Projectile obj = new Projectile(this.model, this.Shape, this.getPosition(), this.rotation, this.scale, this.startTick, this.lifeTime);
+            Projectile obj = new Projectile(this.model, this.Shape, this.getPosition(), this.rotation, this.scale, this.damage, this.startTick, this.lifeTime);
             obj.Force = this.Force;
             obj.Orientation = this.Orientation;
             obj.IsStatic = this.IsStatic;

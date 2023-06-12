@@ -39,7 +39,9 @@ namespace Jitter.Dynamics
     /// </summary>
     public class ContactList : List<Contact>
     {
-
+        /// <summary>
+        /// Something
+        /// </summary>
         public ContactList() : base(4) { }
 
 

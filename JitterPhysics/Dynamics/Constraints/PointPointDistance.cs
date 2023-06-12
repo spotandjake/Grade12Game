@@ -34,10 +34,22 @@ namespace Jitter.Dynamics.Constraints
     /// </summary>
     public class PointPointDistance : Constraint
     {
+        /// <summary>
+        /// Something
+        /// </summary>
         public enum DistanceBehavior
         {
+            /// <summary>
+            /// Something
+            /// </summary>
             LimitDistance,
+            /// <summary>
+            /// Something
+            /// </summary>
             LimitMaximumDistance,
+            /// <summary>
+            /// Something
+            /// </summary>
             LimitMinimumDistance,
         }
 

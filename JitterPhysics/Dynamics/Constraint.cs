@@ -30,6 +30,9 @@ using Jitter.Collision.Shapes;
 namespace Jitter.Dynamics.Constraints
 {
 
+    /// <summary>
+    /// Something
+    /// </summary>
     public interface IConstraint
     {
         void PrepareForIteration(float timestep);

@@ -88,9 +88,18 @@ namespace Jitter.Dynamics.Constraints
             //orientationDifference = JMatrix.Transpose(orientationDifference);
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public JVector AppliedImpulse { get { return accumulatedImpulse; } }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public JMatrix InitialOrientationBody1 { get { return initialOrientation1; } set { initialOrientation1 = value; } }
+        /// <summary>
+        /// Something
+        /// </summary>
         public JMatrix InitialOrientationBody2 { get { return initialOrientation2; } set { initialOrientation2 = value; } }
 
         /// <summary>

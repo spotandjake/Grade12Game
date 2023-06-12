@@ -28,24 +28,42 @@ using System.Collections;
 namespace Jitter.DataStructures
 {
 
+    /// <summary>
+    /// Something
+    /// </summary>
     public class ReadOnlyHashset<T> : IEnumerable, IEnumerable<T>
     {
         private HashSet<T> hashset;
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public ReadOnlyHashset(HashSet<T> hashset) { this.hashset = hashset; }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public IEnumerator GetEnumerator()
         {
             return hashset.GetEnumerator();
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return hashset.GetEnumerator();
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public int Count { get { return hashset.Count; } }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public bool Contains(T item) { return hashset.Contains(item); }
 
     }

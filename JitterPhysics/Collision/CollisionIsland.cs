@@ -63,6 +63,7 @@ namespace Jitter.Collision
         private ReadOnlyHashset<Arbiter> readOnlyArbiter;
         private ReadOnlyHashset<Constraint> readOnlyConstraints;
 
+        /// <summary>
         /// Constructor of CollisionIsland class.
         /// </summary>
         public CollisionIsland()

@@ -34,6 +34,9 @@ namespace Grade12Game
         IGameObject Clone(); // TODO Look into using a generic here
         void Update(GameTime gameTime, WorldHandler world, InputHandler inputHandler);
         void Draw(Camera cam, Renderer renderer);
+
+        bool getIsActive();
+        void setIsActive(bool isActive);
     }
 
     class GameObject : RigidBody, IGameObject
@@ -44,6 +47,7 @@ namespace Grade12Game
             get { return new Vector3(this.Position.X, this.Position.Y, this.Position.Z); }
             set { this.Position = new JVector(value.X, value.Y, value.Z); }
         }
+        // TODO: Seperate model rotation from world Rotation
         protected Vector3 rotation;
         protected Vector3 scale;
         protected Model model;
@@ -51,6 +55,8 @@ namespace Grade12Game
         protected AnimationPlayer animationPlayer;
         protected AnimationClip animationClip;
         protected bool hasBones;
+
+        protected bool isActive;
 
         // Constructor
         public GameObject(
@@ -67,6 +73,7 @@ namespace Grade12Game
             this.setPosition(position);
             this.setRotation(rotation);
             this.setScale(scale);
+            isActive = true;
         }
 
         // Public Methods
@@ -109,6 +116,9 @@ namespace Grade12Game
 
             // Clear Animation Clip
             this.animationClip = null;
+            // If Default ANimation Play
+            if (this.skinningData != null)
+                this.PlayAnimation(this.skinningData.AnimationClips.First().Key);
         }
 
         public Model getModel()
@@ -146,6 +156,15 @@ namespace Grade12Game
             return this.scale;
         }
 
+        public bool getIsActive()
+        {
+            return this.isActive;
+        }
+        public void setIsActive(bool isActive)
+        {
+            this.isActive = isActive;
+        }
+
         public AnimationPlayer getAnimationPlayer()
         {
             return this.animationPlayer;
@@ -176,7 +195,7 @@ namespace Grade12Game
             return obj;
         }
 
-        public void Draw(Camera cam, Renderer renderer)
+        public virtual void Draw(Camera cam, Renderer renderer)
         {
             renderer.DrawGameObject(cam, this);
         }

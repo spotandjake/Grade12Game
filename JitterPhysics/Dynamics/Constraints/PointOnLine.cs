@@ -57,7 +57,6 @@ namespace Jitter.Dynamics.Constraints
         /// <param name="body1"></param>
         /// <param name="body2"></param>
         /// <param name="lineStartPointBody1"></param>
-        /// <param name="lineDirection"></param>
         /// <param name="pointBody2"></param>
         public PointOnLine(RigidBody body1, RigidBody body2,
             JVector lineStartPointBody1, JVector pointBody2) : base(body1,body2)

@@ -49,8 +49,14 @@ namespace Jitter.Collision.Shapes
             UpdateShape();
         }
 
+        /// <summary>
+        /// Shift
+        /// </summary>
         public JVector Shift { get { return -1 * this.shifted; } }
 
+        /// <summary>
+        /// Calculate Mass
+        /// </summary>
         public override void CalculateMassInertia()
         {
             this.mass = Shape.CalculateMassInertia(this, out shifted, out inertia);

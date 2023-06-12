@@ -31,6 +31,9 @@ namespace Jitter.Dynamics
 {
 
     #region public class ContactSettings
+    /// <summary>
+    /// Something
+    /// </summary>
     public class ContactSettings
     {
         public enum MaterialCoefficientMixingType { TakeMaximum, TakeMinimum, UseAverage }

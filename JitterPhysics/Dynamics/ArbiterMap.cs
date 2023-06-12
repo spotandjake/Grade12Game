@@ -138,6 +138,9 @@ namespace Jitter.Dynamics
             return dictionary.TryGetValue(lookUpKey, out arbiter);
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public Dictionary<ArbiterKey, Arbiter>.ValueCollection Arbiters
         {
             get { return dictionary.Values; }
@@ -171,6 +174,9 @@ namespace Jitter.Dynamics
             return dictionary.ContainsKey(lookUpKey);
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public IEnumerator GetEnumerator()
         {
             return dictionary.Values.GetEnumerator();

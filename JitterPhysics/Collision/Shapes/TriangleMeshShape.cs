@@ -62,7 +62,9 @@ namespace Jitter.Collision.Shapes
 
         internal TriangleMeshShape() { }
 
- 
+        /// <summary>
+        /// Something
+        /// </summary>
         protected override Multishape CreateWorkingClone()
         {
             TriangleMeshShape clone = new TriangleMeshShape(this.octree);

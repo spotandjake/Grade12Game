@@ -93,6 +93,9 @@ namespace Jitter.Dynamics.Constraints.SingleBody
         /// </summary>
         public float BiasFactor { get { return biasFactor; } set { biasFactor = value; } }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public JMatrix InitialOrientation { get { return orientation; } set { orientation = value; } }
 
         JMatrix effectiveMass;

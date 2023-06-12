@@ -19,9 +19,19 @@ namespace Jitter.Dynamics.Joints
         private PointOnPoint[] worldPointConstraint;
         private PointPointDistance distance;
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public PointOnPoint PointConstraint1 { get { return worldPointConstraint[0]; } }
+
+        /// <summary>
+        /// Something
+        /// </summary>
         public PointOnPoint PointConstraint2 { get { return worldPointConstraint[1]; } }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public PointPointDistance DistanceConstraint { get { return distance; } }
 
 

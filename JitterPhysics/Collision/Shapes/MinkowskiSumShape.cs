@@ -28,16 +28,25 @@ using Jitter.Collision.Shapes;
 
 namespace Jitter.Collision.Shapes
 {
+    /// <summary>
+    /// Something
+    /// </summary>
     public class MinkowskiSumShape : Shape
     {
         JVector shifted;
         List<Shape> shapes = new List<Shape>();
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public MinkowskiSumShape(IEnumerable<Shape> shapes)
         {
             AddShapes(shapes);
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public void AddShapes(IEnumerable<Shape> shapes)
         {
             foreach (Shape shape in shapes)
@@ -49,6 +58,9 @@ namespace Jitter.Collision.Shapes
             this.UpdateShape();
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public void AddShape(Shape shape)
         {
             if (shape is Multishape) throw new Exception("Multishapes not supported by MinkowskiSumShape.");
@@ -57,6 +69,9 @@ namespace Jitter.Collision.Shapes
             this.UpdateShape();
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public bool Remove(Shape shape)
         {
             if (shapes.Count == 1) throw new Exception("There must be at least one shape.");
@@ -65,16 +80,25 @@ namespace Jitter.Collision.Shapes
             return result;
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public JVector Shift()
         {
             return -1 * this.shifted;
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public override void CalculateMassInertia()
         {
             this.mass = Shape.CalculateMassInertia(this, out shifted, out inertia);
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public override void SupportMapping(ref JVector direction, out JVector result)
         {
             JVector temp1, temp2 = JVector.Zero;

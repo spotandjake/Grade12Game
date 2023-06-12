@@ -98,7 +98,9 @@ namespace Jitter.Collision.Shapes
 
         internal TerrainShape() { }
 
- 
+        /// <summary>
+        /// Something
+        /// </summary>
         protected override Multishape CreateWorkingClone()
         {
             TerrainShape clone = new TerrainShape();

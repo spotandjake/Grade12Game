@@ -42,11 +42,8 @@ namespace Jitter.Dynamics.Constraints.SingleBody
         /// <summary>
         /// Initializes a new instance of the DistanceConstraint class.
         /// </summary>
-        /// <param name="body1">The first body.</param>
-        /// <param name="body2">The second body.</param>
-        /// <param name="anchor1">The anchor point of the first body in world space. 
-        /// The distance is given by the initial distance between both anchor points.</param>
-        /// <param name="anchor2">The anchor point of the second body in world space.
+        /// <param name="body">The first body.</param>
+        /// <param name="localAnchor">The anchor point of the first body in world space. 
         /// The distance is given by the initial distance between both anchor points.</param>
         public PointOnPoint(RigidBody body, JVector localAnchor)
             : base(body, null)
@@ -56,6 +53,9 @@ namespace Jitter.Dynamics.Constraints.SingleBody
             this.anchor = body.position + JVector.Transform(localAnchor, body.orientation);
         }
 
+        /// <summary>
+        /// Something
+        /// </summary>
         public float AppliedImpulse { get { return accumulatedImpulse; } }
 
         /// <summary>

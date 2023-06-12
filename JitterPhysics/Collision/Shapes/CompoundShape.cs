@@ -59,6 +59,9 @@ namespace Jitter.Collision.Shapes
             /// </summary>
             public JVector Position { get { return position; } set { position = value; UpdateBoundingBox(); } }
 
+            /// <summary>
+            /// Boundiing box
+            /// </summary>
             public JBBox BoundingBox { get { return boundingBox; } }
 
             /// <summary>

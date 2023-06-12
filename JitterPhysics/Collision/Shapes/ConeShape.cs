@@ -59,6 +59,9 @@ namespace Jitter.Collision.Shapes
             this.UpdateShape();
         }
 
+        /// <summary>
+        /// Update Shape
+        /// </summary>
         public override void UpdateShape()
         {
             sina = radius / (float)Math.Sqrt(radius * radius + height * height);

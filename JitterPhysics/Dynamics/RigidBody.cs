@@ -47,8 +47,8 @@ namespace Jitter.Dynamics
         [Flags]
         public enum DampingType { None = 0x00, Angular = 0x01, Linear = 0x02 }
 
-        internal JMatrix inertia;
-        internal JMatrix invInertia;
+        protected JMatrix inertia;
+        protected JMatrix invInertia;
 
         internal JMatrix invInertiaWorld;
         internal JMatrix orientation;

@@ -30,7 +30,6 @@ namespace Grade12Game
 
         InputHandler inputHandler;
 
-        // TODO: Move this into world to be handled
         Camera camera;
         WorldHandler world;
 
@@ -54,7 +53,7 @@ namespace Grade12Game
                 GraphicsDevice.Viewport.Height,
                 farPlaneDistance
             );
-            this.camera = new Camera(new Vector3(0, 70, -50), new Vector3(0, 0, 0));
+            this.camera = new Camera(new Vector3(0, 70, -50), new Vector3(0));
             this.inputHandler = new InputHandler(PlayerIndex.One);
             // Physics Testing
             base.Initialize();
@@ -66,21 +65,20 @@ namespace Grade12Game
         /// </summary>
         protected override void LoadContent()
         {
-            Shape shape = new BoxShape(1.0f, 20.0f, 3.0f);
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Content.RootDirectory = "Content";
+            Shape characterShape = new BoxShape(1.0f, 20.0f, 3.0f);
             Model characterModel = Content.Load<Model>("Models/dude"); //Loads your new model, point it towards your model
             GameObject randomPlayer = new GameObject(
                 characterModel,
-                shape,
+                characterShape,
                 new Vector3(0, 90, 0),
-                new Vector3(0, 0, 0),
-                new Vector3(1, 1, 1)
+                new Vector3(0),
+                new Vector3(1)
             );
             randomPlayer.PlayAnimation("Take 001");
-            Model cubeModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
             // Load Our Tower Bases
             Shape smallTowerShape = new BoxShape(15.0f, 15.0f, 15.0f);
             Model smallTowerModel = Content.Load<Model>("Models/Turrets/smallTurret");
@@ -88,28 +86,29 @@ namespace Grade12Game
             Model mediumTowerModel = Content.Load<Model>("Models/Turrets/mediumTurret");
             Shape largeTowerShape = new BoxShape(15.0f, 15.0f, 15.0f);
             Model largeTowerModel = Content.Load<Model>("Models/Turrets/largeTurret");
+            Vector3 rot = new Vector3(0, -MathHelper.PiOver2, 0);
             IGameObject[] turretTypes = new IGameObject[]
             {
                  new SmallTurret(
                     smallTowerModel,
                     smallTowerShape,
-                    new Vector3(0, 0, 0),
-                    new Vector3(0, -MathHelper.PiOver2, 0),
-                    new Vector3(5, 5, 5)
+                    new Vector3(0),
+                    rot,
+                    new Vector3(5)
                 ),
                 new MediumTurret(
                     mediumTowerModel,
                     mediumTowerShape,
-                    new Vector3(0, 0, 0),
-                    new Vector3(0, -MathHelper.PiOver2, 0),
-                    new Vector3(5, 5, 5)
+                    new Vector3(0),
+                    rot,
+                    new Vector3(5)
                 ),
                 new LargeTurret(
                     largeTowerModel,
                     largeTowerShape,
-                    new Vector3(0, 0, 0),
-                    new Vector3(0, -MathHelper.PiOver2, 0),
-                    new Vector3(5, 5, 5)
+                    new Vector3(0),
+                    rot,
+                    new Vector3(5)
                 )
             };
             // Load Our Projectile
@@ -118,46 +117,57 @@ namespace Grade12Game
             Projectile projectile = new Projectile(
                 projectileModel,
                 projectileShape,
-                new Vector3(0, 0, 0),
-                new Vector3(0, 0, 0),
-                new Vector3(2, 2, 2),
+                new Vector3(0),
+                new Vector3(0),
+                new Vector3(2),
+                100,
                 0,
                 10000000
             );
             projectile.AffectedByGravity = false;
             // Create Our Block Templates
+            Model nonPathModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
             Shape pathShape = new BoxShape(20.0f, 20.0f, 20.0f);
             GameObject nonPathBlock = new GameObject(
-                cubeModel,
+                nonPathModel,
                 pathShape,
-                new Vector3(0, 0, 0),
-                new Vector3(0, 0, 0),
-                new Vector3(20, 20, 20)
+                new Vector3(0),
+                new Vector3(0),
+                new Vector3(20)
             );
             Model pathModel = Content.Load<Model>("Models/path"); //Loads your new model, point it towards your model
             GameObject pathBlock = new GameObject(
                 pathModel,
                 pathShape,
-                new Vector3(0, 0, 0),
-                new Vector3(0, 0, 0),
-                new Vector3(20, 20, 20)
+                new Vector3(0),
+                new Vector3(0),
+                new Vector3(20)
             );
+            // Create Enemies
+            Shape smallEnemyShape = new BoxShape(1.0f, 20.0f, 3.0f);
+            Model smallEnemyModel = Content.Load<Model>("Models/dude");
+            EnemyType[] enemyTypes = new EnemyType[] {
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), 10, 100, 1)
+            };
             // Load Our SpriteFont
             SpriteFont spriteFont = Content.Load<SpriteFont>("Arial");
             // Create Our World
             this.world = new WorldHandler(
                 camera,
                 new CollisionSystemSAP(),
+                // Templates
                 nonPathBlock,
                 pathBlock,
                 spriteFont,
                 turretTypes,
-                projectile
+                projectile,
+                enemyTypes
             );
-            world.addGameObject(randomPlayer);
+            //world.addGameObject(randomPlayer);
             this.world.advanceTurn();
             this.world.advanceTurn();
-            this.world.advanceTurn();
+            //this.world.advanceTurn();
+            world.startWave();
         }
 
         /// <summary>
@@ -179,15 +189,12 @@ namespace Grade12Game
             // Update Inputs
             this.inputHandler.Update(gameTime);
             // Handle Exit
-            if (this.inputHandler.isExitDown)
-            {
-                this.Exit();
-            }
+            if (this.inputHandler.isExitDown) this.Exit();
             // Update World
             this.world.Update(gameTime, inputHandler);
             // Write Old State
             this.inputHandler.writeOldState();
-
+            // Xna Update
             base.Update(gameTime);
         }
 
@@ -197,14 +204,17 @@ namespace Grade12Game
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            // Clear Screen
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
+            // When drawing 3d, if we want to draw textt we need to use spriteBatch.Begin
+            // spriteBatch.Begin messes witth our drawing states, we need to sett these to make sure things render properly
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            // Draw World
             this.world.Draw(renderer, spriteBatch);
-
-            // TODO: Add your drawing code here
             spriteBatch.End();
+            // XNA Draw
             base.Draw(gameTime);
         }
     }

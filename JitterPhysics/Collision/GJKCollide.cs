@@ -67,7 +67,6 @@ namespace Jitter.Collision
         /// </summary>
         /// <param name="support">The supportmap implementation representing the shape.</param>
         /// <param name="orientation">The orientation of the shape.</param>
-        /// <param name="invOrientation">The inverse orientation of the shape.</param>
         /// <param name="position">The position of the shape.</param>
         /// <param name="point">The point to check.</param>
         /// <returns>Returns true if the point is within the shape, otherwise false.</returns>

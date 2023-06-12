@@ -137,6 +137,9 @@ namespace Jitter.Collision
 
         Action<object> detectCallback, sortCallback;
 
+        /// <summary>
+        /// Full 3-Axis SweepAndPrune using persistent updates.
+        /// </summary>
         public CollisionSystemPersistentSAP()
         {
             detectCallback = new Action<object>(DetectCallback);
@@ -221,6 +224,9 @@ namespace Jitter.Collision
         #endregion
 
         int addCounter = 0;
+        /// <summary>
+        /// Add an entity to the collision system.
+        /// </summary>
         public override void AddEntity(IBroadphaseEntity body)
         {
             bodyList.Add(body);
