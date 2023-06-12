@@ -124,7 +124,7 @@ namespace Grade12Game
                 if (this.getIsActive())
                 {
                     // Apply Movement
-                    this.LinearVelocity = new JVector((float)Math.Sin(this.rotation.X) * -speed, 0, (float)Math.Cos(this.rotation.X) * -speed);
+                    this.LinearVelocity = new JVector((float)Math.Sin(this.rotation.X) * -speed, this.LinearVelocity.Y, (float)Math.Cos(this.rotation.X) * -speed);
                     // If Close Then Set New Target
                     if (targetRot.LengthSquared() < 1)
                     {
