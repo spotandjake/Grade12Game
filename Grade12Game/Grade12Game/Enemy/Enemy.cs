@@ -69,6 +69,8 @@ namespace Grade12Game
 
         private Vector3 currentTarget;
 
+        private float y = 0;
+
         // Wont let me use const here
         private readonly Vector3 unset = new Vector3(float.MaxValue);
         // Constructor
@@ -88,6 +90,7 @@ namespace Grade12Game
             int health
         ) : base(model, shape, position, rotation, scale)
         {
+            y = position.Y;
             this.path = path;
             this.immutablePath = immutablePath;
             this.stepsUntilSpawn = stepsUntilSpawn;
@@ -98,6 +101,7 @@ namespace Grade12Game
         // Custom Update Behaviour
         public override void Update(GameTime gameTime, WorldHandler world, InputHandler input)
         {
+            this.setPosition(new Vector3(this.getPosition().X, y, this.getPosition().Z));
             // TODO: Figure out why we initially go the wrong way
             if (stepsUntilSpawn > 0)
             {
@@ -124,7 +128,7 @@ namespace Grade12Game
                 if (this.getIsActive())
                 {
                     // Apply Movement
-                    this.LinearVelocity = new JVector((float)Math.Sin(this.rotation.X) * -speed, this.LinearVelocity.Y, (float)Math.Cos(this.rotation.X) * -speed);
+                    this.LinearVelocity = new JVector((float)Math.Sin(this.rotation.X) * -speed, 0, (float)Math.Cos(this.rotation.X) * -speed);
                     // If Close Then Set New Target
                     if (targetRot.LengthSquared() < 1)
                     {
@@ -139,6 +143,8 @@ namespace Grade12Game
                 {
                     // Remove Myself
                     world.removeGameObject(this);
+                    // TODO: Make 1 not a magic number
+                    world.doBaseDamage(1);
                 } else
                 {
                     currentTarget = path.Peek();
@@ -150,6 +156,10 @@ namespace Grade12Game
             base.Update(gameTime, world, input);
         }
 
+        public int getHealth()
+        {
+            return this.health;
+        }
         // doDamge
         public void DoDamage(int damage)
         {

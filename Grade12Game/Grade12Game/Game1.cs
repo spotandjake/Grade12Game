@@ -166,6 +166,7 @@ namespace Grade12Game
             //world.addGameObject(randomPlayer);
             this.world.advanceTurn();
             this.world.advanceTurn();
+            this.world.advanceTurn();
             //this.world.advanceTurn();
             world.startWave();
         }

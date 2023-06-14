@@ -96,7 +96,9 @@ namespace Grade12Game
         private EnemyType[] enemyTemplates;
 
         public readonly Projectile projectile;
-
+        // Money and stats
+        private int money = 10000;
+        private int baseHealth = 100;
         // Settings
         private bool debug;
 
@@ -513,7 +515,7 @@ namespace Grade12Game
                 Enemy enemy = new Enemy(
                     choosenEnemy.model,
                     choosenEnemy.shape,
-                    new Vector3(0, 20, 0),
+                    new Vector3(0, 15, 0),
                     choosenEnemy.rotation,
                     choosenEnemy.scale,
                     stepsUntilSpawn,
@@ -522,6 +524,7 @@ namespace Grade12Game
                     choosenEnemy.speed,
                     choosenEnemy.health
                 );
+                enemy.AffectedByGravity = false;
                 enemy.setIsActive(false);
                 // Add Enemy To World
                 this.addGameObject(enemy);
@@ -532,6 +535,27 @@ namespace Grade12Game
             }
         }
 
+        public void doBaseDamage(int damage)
+        {
+            this.baseHealth -= damage;
+            if (this.baseHealth < 0) this.baseHealth = 0;
+        }
+
+        public int getBaseHealth()
+        {
+            return this.baseHealth;
+        }
+
+        public void takeMoney(int money)
+        {
+            this.money -= money;
+            if (this.money < 0) this.money = 0;
+        }
+        public int getMoney()
+        {
+            return this.money;
+        }
+
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
         {
@@ -540,21 +564,33 @@ namespace Grade12Game
             // Spawn Turret
             if (input.isNumber1KeyPressed)
             {
-                IGameObject tower = towerTemplates[0].Clone();
-                tower.setPosition(player.getPosition());
-                this.addGameObject(tower);
+                //if (this.getMoney() >= 100)
+                {
+                    this.takeMoney(100);
+                    IGameObject tower = towerTemplates[0].Clone();
+                    tower.setPosition(player.getPosition());
+                    this.addGameObject(tower);
+                }
             }
             if (input.isNumber2KeyPressed)
             {
-                IGameObject tower = towerTemplates[1].Clone();
-                tower.setPosition(player.getPosition());
-                this.addGameObject(tower);
+                //if (this.getMoney() >= 200)
+                {
+                    this.takeMoney(200);
+                    IGameObject tower = towerTemplates[1].Clone();
+                    tower.setPosition(player.getPosition());
+                    this.addGameObject(tower);
+                }
             }
             if (input.isNumber3KeyPressed)
             {
-                IGameObject tower = towerTemplates[2].Clone();
-                tower.setPosition(player.getPosition());
-                this.addGameObject(tower);
+                //if (this.getMoney() >= 300)
+                {
+                    this.takeMoney(300);
+                    IGameObject tower = towerTemplates[2].Clone();
+                    tower.setPosition(player.getPosition());
+                    this.addGameObject(tower);
+                }
             }
             // Call GameObject Updates
             List<IGameObject> tempGameOjects = new List<IGameObject>(gameObjects);
@@ -652,6 +688,38 @@ namespace Grade12Game
                 spriteBatch.DrawString(
                     spriteFont,
                     "Rotation: " + player.getRotation().ToString(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "World Stats: ",
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Money: " + this.getMoney(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "baseHealth: " + this.getBaseHealth(),
+                    new Vector2(0, currentY += textYSize),
+                    Color.White
+                );
+                int avgEnemyHealth = 0;
+                int eCount = 0;
+                foreach (Enemy e in this.getEnemies())
+                {
+                    avgEnemyHealth += e.getHealth();
+                    eCount++;
+                }
+                avgEnemyHealth /= eCount;
+                spriteBatch.DrawString(
+                    spriteFont,
+                    "Avg Enemy Health: " + avgEnemyHealth,
                     new Vector2(0, currentY += textYSize),
                     Color.White
                 );

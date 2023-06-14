@@ -19,7 +19,7 @@ namespace Grade12Game
 {
     class Projectile : GameObject
     {
-        private const float hitDistance = 10;
+        private const float hitDistance = 30;
 
         private long startTick;
         private long lifeTime;

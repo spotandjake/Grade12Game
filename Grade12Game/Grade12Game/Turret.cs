@@ -23,7 +23,7 @@ namespace Grade12Game
         protected long lastShot;
         protected long currentShotRate = 0;
         protected readonly long shotRate = 10000000;
-        protected readonly float projSpeed = 50;
+        protected readonly float projSpeed = 70;
 
         protected float range;
 
