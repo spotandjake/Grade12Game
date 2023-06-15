@@ -165,22 +165,22 @@ namespace Grade12Game
             Shape smallEnemyShape = new BoxShape(1.0f, 20.0f, 3.0f);
             Model smallEnemyModel = Content.Load<Model>("Models/dude");
             EnemyType[] enemyTypes = new EnemyType[] {
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 15, 100, 1, 10, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 20, 100, 1.25f, 15, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 25, 100, 1.5f, 15, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 30, 100, 1.75f, 15, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 15, 300, 3, 20, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 20, 300, 3.25f, 25, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 25, 300, 3.5f, 25, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 30, 300, 3.75f, 25, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 15, 400, 10, 25, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 20, 400, 10.25f, 25, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 25, 400, 10.5f, 25, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 30, 400, 10.75f, 25, false),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 15, 1000, 15, 25, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 20, 1000, 15.25f, 25, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 25, 1000, 15.5f, 25, true),
-                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 30, 1000, 15.75f, 25, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 15, 100, 1, 10, 1, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 20, 100, 1.25f, 15, 1, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 25, 100, 1.5f, 15, 1, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 30, 100, 1.75f, 15, 1, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 15, 300, 3, 20, 1, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 20, 300, 3.25f, 25, 1, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 25, 300, 3.5f, 25, 1, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(1), new Vector3(0, 15, 0), 30, 300, 3.75f, 25, 1, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 15, 400, 10, 25, 2, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 20, 400, 10.25f, 25, 2, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 25, 400, 10.5f, 25, 2, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 30, 400, 10.75f, 25, 2, false),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 15, 1000, 15, 25, 5, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 20, 1000, 15.25f, 25, 5, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 25, 1000, 15.5f, 25, 5, true),
+                new EnemyType(smallEnemyModel, smallEnemyShape, new Vector3(0), new Vector3(2), new Vector3(0, 15, 0), 30, 1000, 15.75f, 25, 5, true),
             };
             // Load Our SpriteFont
             SpriteFont spriteFont = Content.Load<SpriteFont>("Arial");

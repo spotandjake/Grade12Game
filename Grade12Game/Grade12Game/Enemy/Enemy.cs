@@ -34,6 +34,7 @@ namespace Grade12Game
         public readonly int health;
         public readonly float difficulty;
         public readonly int moneyDrop;
+        public readonly int damage;
         // Effects
         public readonly bool isMonsterMatrix;
         // Constructor
@@ -49,6 +50,7 @@ namespace Grade12Game
             int health,
             float difficulty,
             int moneyDrop,
+            int damage,
             // Effects
             bool isMonsterMatrix
         )
@@ -64,6 +66,7 @@ namespace Grade12Game
             this.health = health;
             this.difficulty = difficulty;
             this.moneyDrop = moneyDrop;
+            this.damage = damage;
             // Sett Spawn Effects
             this.isMonsterMatrix = isMonsterMatrix;
         }
@@ -84,7 +87,7 @@ namespace Grade12Game
         private float y = 0;
 
         // The Damage Enemy's do to the base
-        private const int damage = 1;
+        private int damage;
 
         // Wont let me use const here
         private readonly Vector3 unset = new Vector3(float.MaxValue);
@@ -104,6 +107,7 @@ namespace Grade12Game
             float speed,
             int health,
             int moneyDrop,
+            int damage,
             // Effects
             bool monsterMash
         ) : base(model, shape, position, rotation, scale)
@@ -115,6 +119,7 @@ namespace Grade12Game
             this.speed = speed;
             this.health = health;
             this.moneyDrop = moneyDrop;
+            this.damage = damage;
             currentTarget = unset;
             this.setMonsterMash(monsterMash);
         }
@@ -164,7 +169,7 @@ namespace Grade12Game
                 {
                     // Remove Myself
                     world.removeGameObject(this);
-                    world.doBaseDamage(damage);
+                    world.doBaseDamage(this.damage);
                 } else
                 {
                     currentTarget = path.Peek();

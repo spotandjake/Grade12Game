@@ -71,7 +71,7 @@ namespace Grade12Game
 
         public override IGameObject Clone()
         {
-            // TODO: Look into cloning the model and shape
+            // CLone projectile, we need to clone using this so ew can clone the additional stuff
             Projectile obj = new Projectile(this.model, this.Shape, this.getPosition(), this.rotation, this.scale, this.damage, this.startTick, this.lifeTime);
             obj.Force = this.Force;
             obj.Orientation = this.Orientation;

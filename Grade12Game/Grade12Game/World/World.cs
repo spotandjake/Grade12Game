@@ -19,6 +19,13 @@ using Jitter.LinearMath;
 
 namespace Grade12Game
 {
+    // Scene
+    enum Scene
+    {
+        MainMenu,
+        GamePlay,
+        Dead,
+    }
     // Cell Struct
     struct Cell
     {
@@ -63,6 +70,7 @@ namespace Grade12Game
         private const int mapXLength = 3;
 
         // Properties
+        private Scene scene;
         public readonly Random rand;
         public readonly MidiPlayer soundManager;
         private float difficulty;
@@ -90,6 +98,8 @@ namespace Grade12Game
         private int baseHealth = 100;
         private bool canStartWave = true;
         private bool autoPlay = false;
+        private int turnsUntilNextCell;
+        private int currentWave;
         // Settings
         private bool debug;
 
@@ -114,6 +124,7 @@ namespace Grade12Game
             : base(collision)
         {
             // Set Our Props
+            turnsUntilNextCell = 0;
             this.player = player;
             this.difficulty = 0;
             this.level = 0;
@@ -125,7 +136,7 @@ namespace Grade12Game
             rand = new Random();
             world = new List<Cell>();
             cellEndIndex = cellSize / 2;
-            debug = true;
+            debug = false;
             autoPlay = false;
             this.spriteFont = spriteFont;
             this.nonPathCell = nonPathCell;
@@ -139,8 +150,9 @@ namespace Grade12Game
             this.xPlus = true;
             turnLastGen = true;
             this.generateCell();
+
+            this.setScene(Scene.MainMenu);
         }
-        // TODO: Rewrite the entire world gen bassically, relating to what side to spawn on
         public void generateCell()
         {
             // We Generate Towards xPlus
@@ -379,10 +391,14 @@ namespace Grade12Game
             {
                 for (int j = 0; j < cellSize; j++)
                 {
+                    // We need to add a physics object for each cell the math takes the local coordinates and converts them to world coordinates
                     float nodeWorldX = cell.cellX * cellSize * cellNodeSize + j * cellNodeSize;
                     float nodeWorldY = cell.cellY * cellSize * cellNodeSize + i * cellNodeSize;
+                    // Clone a nonPathCell from template
                     IGameObject tmpNonPathCell = nonPathCell.Clone();
+                    // set it to its world position
                     tmpNonPathCell.setPosition(new Vector3(nodeWorldX, -5, nodeWorldY));
+                    // We need this to be a rigid body which we know it is.
                     RigidBody r = (RigidBody)tmpNonPathCell;
                     r.AffectedByGravity = false;
                     r.IsStatic = true;
@@ -418,7 +434,13 @@ namespace Grade12Game
         // Start Wave
         public void startWave()
         {
-            this.generateCell();
+            currentWave++;
+            turnsUntilNextCell++;
+            if (turnsUntilNextCell >= 5)
+            {
+                this.generateCell();
+                turnsUntilNextCell = 0;
+            }
             // Update Level and difficulty
             this.level++;
             // TODO: Change how we calculate difficulty
@@ -427,7 +449,6 @@ namespace Grade12Game
             // Spawn New World Item
             Stack<Vector3> currentWorldPath = getWorldPath();
 
-            // TODO: Create Enemys
             float waveDifficulty = this.difficulty;
             int stepsUntilSpawn = 16;
             while (waveDifficulty > 0) {
@@ -450,6 +471,7 @@ namespace Grade12Game
                     choosenEnemy.speed,
                     choosenEnemy.health * (int)this.difficulty / 2,
                     choosenEnemy.moneyDrop,
+                    choosenEnemy.damage,
                     choosenEnemy.isMonsterMatrix
                 );
                 enemy.AffectedByGravity = false;
@@ -488,79 +510,117 @@ namespace Grade12Game
             this.money += money;
         }
 
+        public void setScene(Scene scene)
+        {
+            this.scene = scene;
+        }
+        public Scene getScene()
+        {
+            return this.scene;
+        }
+
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
         {
-            // debug Menu
-            if (input.clearWave)
+            // Update behaviour based on scene
+            switch (this.getScene())
             {
-                foreach (Enemy e in this.getEnemies())
-                {
-                    e.DoDamage(e.getHealth());
-                }
+                case Scene.MainMenu:
+                    if (input.startGame)
+                    {
+                        // On space start game
+                        this.setScene(Scene.GamePlay);
+                    }
+                    break;
+                case Scene.GamePlay:
+                    // debug Menu
+                    if (input.clearWave)
+                    {
+                        // KIlls everything part of the developer tools
+                        foreach (Enemy e in this.getEnemies())
+                        {
+                            e.DoDamage(e.getHealth());
+                        }
+                    }
+                    if (input.toggleAutoPlay)
+                    {
+                        // AUto play mode where you dont need to start ROunds
+                        autoPlay = !autoPlay;
+                    }
+                    if (input.debugMenu)
+                        debug = !debug;
+                    if (input.debugAdddMoney) this.addMoney(1000);
+                    // Update Player
+                    player.Update(gameTime, input);
+                    if (input.tpBase)
+                    {
+                        // Tp To THe Base
+                        player.setPosition(new Vector3(this.getWorldPath().Last().X, player.getPosition().Y, this.getWorldPath().Last().Z));
+                    }
+                    if (input.tpStart)
+                    {
+                        // Tp to the enemy start
+                        player.setPosition(new Vector3(this.getWorldPath().First().X, player.getPosition().Y, this.getWorldPath().First().Z));
+                    }
+                    // Spawn Turret, / Buy Turret
+                    if (input.isNumber1KeyPressed)
+                    {
+                        // If we have enough money
+                        if (this.getMoney() >= 100)
+                        {
+                            this.takeMoney(100); // Take Money
+                            // Clone the turret from template
+                            IGameObject tower = towerTemplates[0].Clone();
+                            tower.setPosition(player.getPosition());
+                            // Spawn
+                            this.addGameObject(tower);
+                        }
+                    }
+                    if (input.isNumber2KeyPressed)
+                    {
+                        if (this.getMoney() >= 200)
+                        {
+                            this.takeMoney(200);
+                            IGameObject tower = towerTemplates[1].Clone();
+                            tower.setPosition(player.getPosition());
+                            this.addGameObject(tower);
+                        }
+                    }
+                    if (input.isNumber3KeyPressed)
+                    {
+                        if (this.getMoney() >= 300)
+                        {
+                            this.takeMoney(300);
+                            IGameObject tower = towerTemplates[2].Clone();
+                            tower.setPosition(player.getPosition());
+                            this.addGameObject(tower);
+                        }
+                    }
+                    // Call GameObject Updates
+                    List<IGameObject> tempGameOjects = new List<IGameObject>(gameObjects);
+                    foreach (IGameObject obj in tempGameOjects)
+                    {
+                        obj.Update(gameTime, this, input);
+                    }
+                    // Map To KeyBind
+                    canStartWave = getEnemies().Count == 0;
+                    if ((canStartWave && input.startWave) || (canStartWave && autoPlay)) this.startWave();
+                    // Update Physics
+                    float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (step > 1.0f / 100.0f)
+                        step = 1.0f / 100.0f;
+                    this.Step(step * 10, true);
+
+                    // Handle Death
+                    if (this.baseHealth < 0)
+                    {
+                        this.setScene(Scene.Dead);
+                    }
+                    break;
+                case Scene.Dead:
+                    // Do Nothing
+                    break;
             }
-            if (input.toggleAutoPlay)
-            {
-                autoPlay = !autoPlay;
-            }
-            if (input.debugMenu)
-                debug = !debug;
-            if (input.debugAdddMoney) this.addMoney(1000);
-            // Update Player
-            player.Update(gameTime, input);
-            if (input.tpBase)
-            {
-                player.setPosition(new Vector3(this.getWorldPath().Last().X, player.getPosition().Y, this.getWorldPath().Last().Z));
-            }
-            if (input.tpStart)
-            {
-                player.setPosition(new Vector3(this.getWorldPath().First().X, player.getPosition().Y, this.getWorldPath().First().Z));
-            }
-            // Spawn Turret
-            if (input.isNumber1KeyPressed)
-            {
-                if (this.getMoney() >= 100)
-                {
-                    this.takeMoney(100);
-                    IGameObject tower = towerTemplates[0].Clone();
-                    tower.setPosition(player.getPosition());
-                    this.addGameObject(tower);
-                }
-            }
-            if (input.isNumber2KeyPressed)
-            {
-                if (this.getMoney() >= 200)
-                {
-                    this.takeMoney(200);
-                    IGameObject tower = towerTemplates[1].Clone();
-                    tower.setPosition(player.getPosition());
-                    this.addGameObject(tower);
-                }
-            }
-            if (input.isNumber3KeyPressed)
-            {
-                if (this.getMoney() >= 300)
-                {
-                    this.takeMoney(300);
-                    IGameObject tower = towerTemplates[2].Clone();
-                    tower.setPosition(player.getPosition());
-                    this.addGameObject(tower);
-                }
-            }
-            // Call GameObject Updates
-            List<IGameObject> tempGameOjects = new List<IGameObject>(gameObjects);
-            foreach (IGameObject obj in tempGameOjects)
-            {
-                obj.Update(gameTime, this, input);
-            }
-            // Map To KeyBind
-            canStartWave = getEnemies().Count == 0;
-            if ((canStartWave && input.startWave) || (canStartWave && autoPlay)) this.startWave();
-            // Update Physics
-            float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (step > 1.0f / 100.0f)
-                step = 1.0f / 100.0f;
-            this.Step(step * 10, true);
         }
 
         // Toggle Debug
@@ -572,128 +632,221 @@ namespace Grade12Game
         // Draw World
         public void Draw(Renderer renderer, SpriteBatch spriteBatch)
         {
-            // Render Debug Info
-            if (this.debug)
-            {
-                int currentY = 0;
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Garbage Collection:",
-                    new Vector2(0, currentY),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "gen0: " + GC.CollectionCount(0).ToString(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "gen1: " + GC.CollectionCount(1).ToString(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "gen2: " + GC.CollectionCount(2).ToString(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Physics:",
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                double total = 0;
-                for (int i = 0; i < (int)Jitter.World.DebugType.Num; i++)
-                {
-                    total += this.DebugTimes[i];
-                }
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "RigidBodys: " + this.RigidBodies.Count.ToString(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "TotalTime: " + total.ToString("0.00"),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "FrameRate: " + (1000.0d / total).ToString("0"),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Cam Info:",
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Position: " + player.getPosition().ToString(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Rotation: " + player.getRotation().ToString(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "World Stats: ",
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Money: " + this.getMoney(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "baseHealth: " + this.getBaseHealth(),
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-                int avgEnemyHealth = 0;
-                int eCount = 0;
-                foreach (Enemy e in this.getEnemies())
-                {
-                    avgEnemyHealth += e.getHealth();
-                    eCount++;
-                }
-                if (eCount != 0) avgEnemyHealth /= eCount;
-                spriteBatch.DrawString(
-                    spriteFont,
-                    "Avg Enemy Health: " + avgEnemyHealth,
-                    new Vector2(0, currentY += textYSize),
-                    Color.White
-                );
-            }
-            // Render The Cells In The World
-            foreach (Cell cell in this.world)
-            {
-                // Render Each Cell Node
-                foreach (IGameObject gameObject in cell.cellObjects)
-                {
-                    gameObject.Draw(player, renderer);
-                }
-            }
-            // Render Wave Objects
-            foreach (IGameObject obj in gameObjects)
-            {
-                if (obj.getIsActive())
-                    obj.Draw(player, renderer);
+            // Draw Based On Scene
+            int currentY = 0;
+            switch (this.getScene()) {
+                case Scene.MainMenu:
+                    string[] lines = new string[]
+                    {
+                        "Press Space To Start Game",
+                        "Controls:",
+                        "WASD To Move Or GamePad Left Stick",
+                        "1,2,3 Or GamePad To Buy Towers",
+                        "   Each Tower Costs its number MUltiplied by 100",
+                        "E and Q to go up and down, No GamePad Equivlant",
+                        "F on keyboard or A on GamePad to start round",
+                        "Tab on keyboard to auto play",
+                        "Arrow keys or right stick to look",
+                    };
+                    currentY = 0;
+                    foreach (string line in lines)
+                    {
+                        Vector2 lineSize = spriteFont.MeasureString(line);
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            line,
+                            new Vector2(renderer.getWidth() / 2 - (int)lineSize.X / 2, currentY),
+                            Color.White
+                        );
+                        // Padding of 15 and the line height
+                        currentY += (int)lineSize.Y + 16;
+                    }
+                    break;
+                case Scene.GamePlay:
+                    // Render Debug Info
+                    if (this.debug)
+                    {
+                        currentY = 0;
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Garbage Collection:",
+                            new Vector2(0, currentY),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "gen0: " + GC.CollectionCount(0).ToString(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "gen1: " + GC.CollectionCount(1).ToString(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "gen2: " + GC.CollectionCount(2).ToString(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Physics:",
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        double total = 0;
+                        for (int i = 0; i < (int)Jitter.World.DebugType.Num; i++)
+                        {
+                            total += this.DebugTimes[i];
+                        }
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "RigidBodys: " + this.RigidBodies.Count.ToString(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "TotalTime: " + total.ToString("0.00"),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "FrameRate: " + (1000.0d / total).ToString("0"),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Cam Info:",
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Position: " + player.getPosition().ToString(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Rotation: " + player.getRotation().ToString(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "World Stats: ",
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Money: " + this.getMoney(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "baseHealth: " + this.getBaseHealth(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        int avgEnemyHealth = 0;
+                        int eCount = 0;
+                        foreach (Enemy e in this.getEnemies())
+                        {
+                            avgEnemyHealth += e.getHealth();
+                            eCount++;
+                        }
+                        if (eCount != 0) avgEnemyHealth /= eCount;
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Avg Enemy Health: " + avgEnemyHealth,
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                    }
+                    else
+                    {
+                        currentY = 0;
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "World Stats: ",
+                            new Vector2(0, currentY),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Money: " + this.getMoney(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "baseHealth: " + this.getBaseHealth(),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Enemy Count: " + this.getEnemies().Count,
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Wave Active: " + (this.getEnemies().Count > 0),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            "Current Wave: " + (this.currentWave),
+                            new Vector2(0, currentY += textYSize),
+                            Color.White
+                        );
+                    }
+                    // Render The Cells In The World
+                    foreach (Cell cell in this.world)
+                    {
+                        // Render Each Cell Node
+                        foreach (IGameObject gameObject in cell.cellObjects)
+                        {
+                            gameObject.Draw(player, renderer);
+                        }
+                    }
+                    // Render Wave Objects
+                    foreach (IGameObject obj in gameObjects)
+                    {
+                        if (obj.getIsActive())
+                            obj.Draw(player, renderer);
+                    }
+                    break;
+                case Scene.Dead:
+                    string[] lines2 = new string[]
+                    {
+                        "Dead Please Restart Game To Try Again",
+                        "You Made It To Wave" + this.currentWave,
+                    };
+                    currentY = 0;
+                    foreach (string line in lines2)
+                    {
+                        Vector2 lineSize = spriteFont.MeasureString(line);
+                        spriteBatch.DrawString(
+                            spriteFont,
+                            line,
+                            new Vector2(renderer.getWidth() / 2 - (int)lineSize.X / 2, currentY),
+                            Color.White
+                        );
+                        // Padding of 15 and the line height
+                        currentY += (int)lineSize.Y + 16;
+                    }
+                    break;
             }
         }
     }

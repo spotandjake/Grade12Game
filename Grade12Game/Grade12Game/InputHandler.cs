@@ -29,6 +29,8 @@ namespace Grade12Game
         public float YawAxis { get; private set; }
 
         // States
+        public bool startGame { get; private set; }
+
         public bool isExitDown { get; private set; }
         public bool isNumber1KeyPressed { get; private set; }
         public bool isNumber2KeyPressed { get; private set; }
@@ -101,6 +103,8 @@ namespace Grade12Game
             if (this.YawAxis > 1)
                 this.YawAxis = 1;
             // Set States
+            this.startGame = isKeyPressed(Keys.Space) || padState.Buttons.Start == ButtonState.Pressed;
+
             this.isNumber1KeyPressed = isKeyPressed(Keys.D1) || padState.DPad.Up == ButtonState.Pressed;
             this.isNumber2KeyPressed = isKeyPressed(Keys.D2) || padState.DPad.Right == ButtonState.Pressed;
             this.isNumber3KeyPressed = isKeyPressed(Keys.D3) || padState.DPad.Down == ButtonState.Pressed;

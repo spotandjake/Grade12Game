@@ -20,6 +20,7 @@ namespace Grade12Game
         private float aspectRatio;
         private readonly float farPlaneDistance;
         private Matrix projection;
+
         // Constructor
         public Renderer(int width, int height, float farPlaneDistance)
         {
@@ -42,8 +43,15 @@ namespace Grade12Game
                 farPlaneDistance
             );
         }
+
+        public int getWidth() {
+            return this.width;
+        }
+        public int getHeight()
+        {
+            return this.height;
+        }
         // Draw Method
-        // TODO: Take A camera Object somewhere
         public void DrawGameObject(Camera camera, GameObject gameObject)
         {
             // Get Cam Internals
@@ -66,7 +74,7 @@ namespace Grade12Game
                 {
                     // Apply Model Transforms, y using matrix math, its not that complex at heart ut hard to explain to someone new.
                     bones[i] *=
-                        // TODO: I think we can do the rotation in one line
+                        // Create a matrix from our JVector rotation
                         new Matrix(
                             gameObject.Orientation.M11, gameObject.Orientation.M12, gameObject.Orientation.M13, 0.0f,
                             gameObject.Orientation.M21, gameObject.Orientation.M22, gameObject.Orientation.M23, 0.0f,
@@ -82,6 +90,8 @@ namespace Grade12Game
                 }
             } else
             {
+                // This is a bugged version I decidedd to use as another enemy type
+                // Create a matrix from our JVector rotation
                 world = new Matrix(
                     gameObject.Orientation.M11, gameObject.Orientation.M12, gameObject.Orientation.M13, 0.0f,
                     gameObject.Orientation.M21, gameObject.Orientation.M22, gameObject.Orientation.M23, 0.0f,
@@ -91,7 +101,7 @@ namespace Grade12Game
                 world *= Matrix.CreateScale(scale / 2);
                 world.Translation = position + scale / 2;
             }
-            // TODO: Create Camera View Matrix
+            // Create Camera View Matrix
             Matrix view = Matrix.CreateTranslation(camPosition*-1) *
                 Matrix.CreateRotationY(camRotation.Y) *
                 Matrix.CreateRotationX(-camRotation.X);
@@ -101,6 +111,7 @@ namespace Grade12Game
                 // Handle setting the transforms
                 if (hasBones)
                 {
+                    // ANimation player
                     foreach (SkinnedEffect effect in mesh.Effects)
                     {
                         effect.SetBoneTransforms(bones);
@@ -114,7 +125,7 @@ namespace Grade12Game
                     }
                 } else
                 {
-
+                    // Normal Static Model
                     foreach (BasicEffect effect in mesh.Effects)
                     {
                         effect.World = world;
