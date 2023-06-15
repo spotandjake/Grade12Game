@@ -46,6 +46,7 @@ namespace Grade12Game
         // Dev Menu Options
         public bool clearWave { get; private set; }
         public bool debugMenu { get; private set; }
+        public bool debugAdddMoney { get; private set; }
 
         // Constructor
         public InputHandler(PlayerIndex playerIndex)
@@ -115,6 +116,7 @@ namespace Grade12Game
             // Developer Menu Stuff
             this.clearWave = isKeyPressed(Keys.NumPad1);
             this.debugMenu = isKeyPressed(Keys.NumPad2);
+            this.debugAdddMoney = isKeyPressed(Keys.NumPad3);
             // Allows the game to exit
             this.isExitDown =
                 padState.Buttons.Back == ButtonState.Pressed || keyState.IsKeyDown(Keys.Escape);

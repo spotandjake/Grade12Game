@@ -115,6 +115,80 @@
       <Processor>ModelProcessor</Processor>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Tower.fbx">
+      <Name>Tower</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Models\tower\textures\Brick\Brick_MT_BaseColor.tga">
+      <Name>Brick_MT_BaseColor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+    <Compile Include="Models\tower\textures\Brick\Brick_MT_Normal.tga.png">
+      <Name>Brick_MT_Normal.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\tower\textures\Brick\Brick_MT_Roughness.tga.png">
+      <Name>Brick_MT_Roughness.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <None Include="Models\tower\textures\Details\Details_MT_BaseColor.tga">
+      <Name>Details_MT_BaseColor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+    <Compile Include="Models\tower\textures\Details\Details_MT_Metallic.tga.png">
+      <Name>Details_MT_Metallic.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\tower\textures\Details\Details_MT_Normal.tga.png">
+      <Name>Details_MT_Normal.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\tower\textures\Details\Details_MT_Roughness.tga.png">
+      <Name>Details_MT_Roughness.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <None Include="Models\tower\textures\Plaster\Plaster_MT_BaseColor.tga">
+      <Name>Plaster_MT_BaseColor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+    <Compile Include="Models\tower\textures\Plaster\Plaster_MT_Normal.tga.png">
+      <Name>Plaster_MT_Normal.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\tower\textures\Plaster\Plaster_MT_Roughness.tga.png">
+      <Name>Plaster_MT_Roughness.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <None Include="Models\tower\textures\Roof\Roof_MT_BaseColor.tga">
+      <Name>Roof_MT_BaseColor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+    <Compile Include="Models\tower\textures\Roof\Roof_MT_Normal.tga.png">
+      <Name>Roof_MT_Normal.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\tower\textures\Roof\Roof_MT_Roughness.tga.png">
+      <Name>Roof_MT_Roughness.tga</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

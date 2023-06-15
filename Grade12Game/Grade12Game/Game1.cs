@@ -149,6 +149,18 @@ namespace Grade12Game
                 new Vector3(0),
                 new Vector3(20)
             );
+            // Load Our base
+            Model baseModel = Content.Load<Model>("Models/Tower"); //Loads your new model, point it towards your model
+            Shape baseShape = new BoxShape(20.0f, 20.0f, 20.0f);
+            GameObject baseObject = new GameObject(
+                baseModel,
+                baseShape,
+                new Vector3(0),
+                new Vector3(0, -MathHelper.PiOver2, -MathHelper.PiOver2),
+                new Vector3(7.5f)
+            );
+            baseObject.IsStatic = true;
+            baseObject.AffectedByGravity = false;
             // Create Enemies
             Shape smallEnemyShape = new BoxShape(1.0f, 20.0f, 3.0f);
             Model smallEnemyModel = Content.Load<Model>("Models/dude");
@@ -178,6 +190,7 @@ namespace Grade12Game
                 new CollisionSystemSAP(),
                 soundManager,
                 // Templates
+                baseObject,
                 nonPathBlock,
                 pathBlock,
                 spriteFont,
@@ -230,6 +243,7 @@ namespace Grade12Game
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             // Draw World
             this.world.Draw(renderer, spriteBatch);
+
             spriteBatch.End();
             // XNA Draw
             base.Draw(gameTime);

@@ -70,6 +70,7 @@ namespace Grade12Game
         // TODO: set this to private
         public Camera player;
         private CollisionSystem collision;
+        private GameObject baseObject;
         private List<IGameObject> gameObjects;
         private List<Projectile> freeProjectiles;
         private List<Cell> world;
@@ -101,6 +102,7 @@ namespace Grade12Game
             Camera player,
             CollisionSystem collision,
             MidiPlayer soundManager,
+            GameObject baseObject,
             GameObject nonPathCell,
             GameObject pathCell,
             SpriteFont spriteFont,
@@ -117,6 +119,7 @@ namespace Grade12Game
             this.level = 0;
             this.collision = collision;
             this.soundManager = soundManager;
+            this.baseObject = baseObject;
             gameObjects = new List<IGameObject>();
             freeProjectiles = new List<Projectile>();
             rand = new Random();
@@ -152,6 +155,8 @@ namespace Grade12Game
             if (cellX == 0 && cellY == 0)
             {
                 startPosition = new Vector2(cellEndIndex / 2, cellEndIndex / 2);
+                baseObject.setPosition(new Vector3(startPosition.X*cellNodeSize, 40, startPosition.Y * cellNodeSize+5));
+                this.addGameObject(baseObject);
             }
             else if (turnLastGen) {
                 // Turn towards Yplus
@@ -500,6 +505,7 @@ namespace Grade12Game
             }
             if (input.debugMenu)
                 debug = !debug;
+            if (input.debugAdddMoney) this.addMoney(1000);
             // Update Player
             player.Update(gameTime, input);
             if (input.tpBase)

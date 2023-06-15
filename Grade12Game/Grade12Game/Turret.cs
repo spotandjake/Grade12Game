@@ -46,6 +46,11 @@ namespace Grade12Game
             this.range = range;
         }
 
+        public override void Update(GameTime gameTime, WorldHandler world, InputHandler inputHandler)
+        {
+            base.Update(gameTime, world, inputHandler);
+        }
+
         public void aimTurret()
         {
             if (target == null) return;
