@@ -20590,7 +20590,7 @@ namespace Grade12Game
             player.noteOff(1, 74); // Turn off Note 74, on channel 1
             player.noteOff(3, 40); // Turn off Note 40, on channel 3
             player.noteOff(3, 52); // Turn off Note 52, on channel 3
-            Thread.Sleep(356666); // Wait For The Next Note
+            Thread.Sleep(300); // Wait For The Next Note
             player.noteOff(1, 79); // Turn off Note 79, on channel 1
             player.changeController(0, 0, 0); // Change The Controller Properties on Channel 0, set the property to 0
             player.programChange(0, 30); // Change The Instrument On Channel 0, To Instrument At Index 30
