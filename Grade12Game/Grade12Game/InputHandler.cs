@@ -34,6 +34,11 @@ namespace Grade12Game
         public bool isNumber2KeyPressed { get; private set; }
         public bool isNumber3KeyPressed { get; private set; }
 
+        public bool deleteTower { get; private set; }
+        public bool placeTower { get; private set; }
+
+        public bool startWave { get; private set; }
+
         // Constructor
         public InputHandler(PlayerIndex playerIndex)
         {
@@ -87,10 +92,14 @@ namespace Grade12Game
             if (this.YawAxis > 1)
                 this.YawAxis = 1;
             // Set States
-            // TODO: Map this onto controller
-            this.isNumber1KeyPressed = isKeyPressed(Keys.D1);
-            this.isNumber2KeyPressed = isKeyPressed(Keys.D2);
-            this.isNumber3KeyPressed = isKeyPressed(Keys.D3);
+            this.isNumber1KeyPressed = isKeyPressed(Keys.D1) || padState.DPad.Up == ButtonState.Pressed;
+            this.isNumber2KeyPressed = isKeyPressed(Keys.D2) || padState.DPad.Right == ButtonState.Pressed;
+            this.isNumber3KeyPressed = isKeyPressed(Keys.D3) || padState.DPad.Down == ButtonState.Pressed;
+
+            this.deleteTower = isKeyPressed(Keys.G) || padState.Buttons.LeftShoulder == ButtonState.Pressed;
+            this.placeTower = isKeyPressed(Keys.Space) || padState.Buttons.RightShoulder == ButtonState.Pressed;
+
+            this.startWave = isKeyPressed(Keys.F) || padState.Buttons.A == ButtonState.Pressed;
             // Allows the game to exit
             this.isExitDown =
                 padState.Buttons.Back == ButtonState.Pressed || keyState.IsKeyDown(Keys.Escape);

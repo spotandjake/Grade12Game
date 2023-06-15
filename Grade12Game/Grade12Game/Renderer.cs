@@ -57,26 +57,28 @@ namespace Grade12Game
             bool hasBones = gameObject.getHasBones();
             // Apply Model Animation
             Matrix[] bones = null;
-            Matrix world =Matrix.CreateScale(0);
+            Matrix world = Matrix.CreateScale(0);
             if (hasBones)
             {
                 bones = animationPlayer.GetSkinTransforms();
+                // Apply trnaslation to each bone in mesh
                 for (int i = 0; i < bones.Length; i++)
                 {
-                    // Apply Model Transforms
+                    // Apply Model Transforms, y using matrix math, its not that complex at heart ut hard to explain to someone new.
                     bones[i] *=
-                       // TODO: I think we can do the rotation in one line
-                       new Matrix(
+                        // TODO: I think we can do the rotation in one line
+                        new Matrix(
                             gameObject.Orientation.M11, gameObject.Orientation.M12, gameObject.Orientation.M13, 0.0f,
                             gameObject.Orientation.M21, gameObject.Orientation.M22, gameObject.Orientation.M23, 0.0f,
                             gameObject.Orientation.M31, gameObject.Orientation.M32, gameObject.Orientation.M33, 0.0f,
                             0.0f, 0.0f, 0.0f, 1.0f
                         )
-                        // TODO: Our scale is no longer a float but a vector figure that out
                         *
                         Matrix.CreateScale(scale / 2) //Applys the scale
                         *
-                        Matrix.CreateWorld(position+scale/2, Vector3.Forward, Vector3.Up); //Move the models position
+                        Matrix.CreateWorld(position + scale / 2, Vector3.Forward, Vector3.Up); //Move the models position
+                   // Was a bug initally, now i use it for rendering the funky looking enemies :)
+                   if (gameObject.getMonsterMash()) bones[i].Translation = position;
                 }
             } else
             {

@@ -96,9 +96,11 @@ namespace Grade12Game
         private EnemyType[] enemyTemplates;
 
         public readonly Projectile projectile;
+
         // Money and stats
-        private int money = 10000;
+        private int money = 195;
         private int baseHealth = 100;
+        private bool canStartWave = true;
         // Settings
         private bool debug;
 
@@ -142,6 +144,8 @@ namespace Grade12Game
             this.towerTemplates = towerTemplates;
             this.projectile = projectile;
             this.enemyTemplates = enemyTemplates;
+            // Make Main platform
+            this.advanceTurn();
         }
         // TODO: Rewrite the entire world gen bassically, relating to what side to spawn on
 
@@ -494,10 +498,12 @@ namespace Grade12Game
         // Start Wave
         public void startWave()
         {
+            this.advanceTurn();
             // Update Level and difficulty
             this.level++;
             // TODO: Change how we calculate difficulty
             this.difficulty++;
+            if (this.difficulty % 5 == 0) this.difficulty += 5;
             // Spawn New World Item
             Stack<Vector3> currentWorldPath = getWorldPath();
 
@@ -515,14 +521,16 @@ namespace Grade12Game
                 Enemy enemy = new Enemy(
                     choosenEnemy.model,
                     choosenEnemy.shape,
-                    new Vector3(0, 15, 0),
+                    choosenEnemy.spawnPosition,
                     choosenEnemy.rotation,
                     choosenEnemy.scale,
                     stepsUntilSpawn,
                     cloneStack(currentWorldPath),
                     cloneStack(currentWorldPath),
                     choosenEnemy.speed,
-                    choosenEnemy.health
+                    choosenEnemy.health * (int)this.difficulty / 2,
+                    choosenEnemy.moneyDrop,
+                    choosenEnemy.isMonsterMatrix
                 );
                 enemy.AffectedByGravity = false;
                 enemy.setIsActive(false);
@@ -555,6 +563,10 @@ namespace Grade12Game
         {
             return this.money;
         }
+        public void addMoney(int money)
+        {
+            this.money += money;
+        }
 
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
@@ -564,7 +576,7 @@ namespace Grade12Game
             // Spawn Turret
             if (input.isNumber1KeyPressed)
             {
-                //if (this.getMoney() >= 100)
+                if (this.getMoney() >= 100)
                 {
                     this.takeMoney(100);
                     IGameObject tower = towerTemplates[0].Clone();
@@ -574,7 +586,7 @@ namespace Grade12Game
             }
             if (input.isNumber2KeyPressed)
             {
-                //if (this.getMoney() >= 200)
+                if (this.getMoney() >= 200)
                 {
                     this.takeMoney(200);
                     IGameObject tower = towerTemplates[1].Clone();
@@ -584,7 +596,7 @@ namespace Grade12Game
             }
             if (input.isNumber3KeyPressed)
             {
-                //if (this.getMoney() >= 300)
+                if (this.getMoney() >= 300)
                 {
                     this.takeMoney(300);
                     IGameObject tower = towerTemplates[2].Clone();
@@ -598,8 +610,9 @@ namespace Grade12Game
             {
                 obj.Update(gameTime, this, input);
             }
-            // TODO: Map To KeyBind
-            if (getEnemies().Count == 0) this.startWave();
+            // Map To KeyBind
+            canStartWave = getEnemies().Count == 0;
+            if (canStartWave && input.startWave) this.startWave();
             // Update Physics
             float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (step > 1.0f / 100.0f)
@@ -716,7 +729,7 @@ namespace Grade12Game
                     avgEnemyHealth += e.getHealth();
                     eCount++;
                 }
-                avgEnemyHealth /= eCount;
+                if (eCount != 0) avgEnemyHealth /= eCount;
                 spriteBatch.DrawString(
                     spriteFont,
                     "Avg Enemy Health: " + avgEnemyHealth,

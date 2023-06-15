@@ -55,6 +55,8 @@ namespace Grade12Game
         protected AnimationPlayer animationPlayer;
         protected AnimationClip animationClip;
         protected bool hasBones;
+        // For Drawing
+        private bool isMonsterMatrix = false;
 
         protected bool isActive;
 
@@ -173,6 +175,15 @@ namespace Grade12Game
         public bool getHasBones()
         {
             return this.hasBones;
+        }
+
+        public void setMonsterMash(bool state)
+        {
+            this.isMonsterMatrix = state;
+        }
+        public bool getMonsterMash()
+        {
+            return this.isMonsterMatrix;
         }
 
         public void PlayAnimation(String Animation)

@@ -33,6 +33,9 @@ namespace Grade12Game
             // Set Rotation
             this.rotation.Y += MathHelper.ToRadians(inputHandler.PitchAxis * speed);
             this.rotation.X += MathHelper.ToRadians(inputHandler.YawAxis * speed);
+            // Lock Rotation
+            if (this.rotation.X < -MathHelper.PiOver2) this.rotation.X = -MathHelper.PiOver2;
+            if (this.rotation.X > MathHelper.PiOver2) this.rotation.X = MathHelper.PiOver2;
             // Calc Velocity
             Vector3 velocity = new Vector3(0, 0, 0);
             velocity.X += (inputHandler.ForwardAxis * (float)Math.Sin(-this.rotation.Y) + inputHandler.SideAxis * -(float)Math.Cos(-this.rotation.Y));

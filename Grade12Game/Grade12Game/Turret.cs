@@ -20,6 +20,7 @@ namespace Grade12Game
 {
     abstract class Turret : GameObject
     {
+
         protected long lastShot;
         protected long currentShotRate = 0;
         protected readonly long shotRate = 10000000;
@@ -28,6 +29,7 @@ namespace Grade12Game
         protected float range;
 
         protected Enemy target;
+
 
         public Turret(
            Model model,
@@ -108,6 +110,7 @@ namespace Grade12Game
 
     class SmallTurret: Turret
     {
+
         public SmallTurret(
             Model model,
             Shape shape,
