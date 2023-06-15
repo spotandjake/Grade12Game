@@ -23,21 +23,18 @@ namespace Grade12Game
     struct Cell
     {
         public readonly List<Vector3> path;
-        public readonly int[,] cellGrid;
-        public readonly IGameObject[,] cellObjects;
+        public readonly List<IGameObject> cellObjects;
         public readonly int cellX;
         public readonly int cellY;
 
         public Cell(
             List<Vector3> path,
-            int[,] cellGrid,
-            IGameObject[,] cellObjects,
+            List<IGameObject> cellObjects,
             int cellX,
             int cellY
         )
         {
             this.path = path;
-            this.cellGrid = cellGrid;
             this.cellObjects = cellObjects;
             this.cellX = cellX;
             this.cellY = cellY;
@@ -63,19 +60,11 @@ namespace Grade12Game
         public const int cellNodeSize = 20;
         private const int obstacleCount = 30; // The higher this is the more likely we are to fail but the better our path should be.
         private const int textYSize = 16;
-
-        //  I think the method we are using for sides has issues and makes things overcomplicated
-
-        public enum CellSide
-        {
-            YMinus, // Up
-            XPlus, // Right
-            YPlus, // Down
-            XMinus, // Left
-        };
+        private const int mapXLength = 3;
 
         // Properties
         public readonly Random rand;
+        public readonly MidiPlayer soundManager;
         private float difficulty;
         private int level;
         // TODO: set this to private
@@ -84,16 +73,14 @@ namespace Grade12Game
         private List<IGameObject> gameObjects;
         private List<Projectile> freeProjectiles;
         private List<Cell> world;
-        private int turnsTillNextCell;
-        private CellSide lastSide;
-        private CellSide nextSide;
         private int cellEndIndex;
-        private int nextCellX;
-        private int nextCellY;
-        private int currentStep = 0;
         private SpriteFont spriteFont;
         private IGameObject[] towerTemplates;
         private EnemyType[] enemyTemplates;
+        private int cellX;
+        private int cellY;
+        private bool xPlus = true;
+        private bool turnLastGen = false;
 
         public readonly Projectile projectile;
 
@@ -101,6 +88,7 @@ namespace Grade12Game
         private int money = 195;
         private int baseHealth = 100;
         private bool canStartWave = true;
+        private bool autoPlay = false;
         // Settings
         private bool debug;
 
@@ -112,6 +100,7 @@ namespace Grade12Game
         public WorldHandler(
             Camera player,
             CollisionSystem collision,
+            MidiPlayer soundManager,
             GameObject nonPathCell,
             GameObject pathCell,
             SpriteFont spriteFont,
@@ -127,17 +116,14 @@ namespace Grade12Game
             this.difficulty = 0;
             this.level = 0;
             this.collision = collision;
+            this.soundManager = soundManager;
             gameObjects = new List<IGameObject>();
             freeProjectiles = new List<Projectile>();
             rand = new Random();
             world = new List<Cell>();
-            turnsTillNextCell = 0;
-            lastSide = CellSide.XMinus;
-            nextSide = getNextCellSide(lastSide);
             cellEndIndex = cellSize / 2;
             debug = true;
-            nextCellX = 0;
-            nextCellY = 0;
+            autoPlay = false;
             this.spriteFont = spriteFont;
             this.nonPathCell = nonPathCell;
             this.pathCell = pathCell;
@@ -145,108 +131,45 @@ namespace Grade12Game
             this.projectile = projectile;
             this.enemyTemplates = enemyTemplates;
             // Make Main platform
-            this.advanceTurn();
+            this.cellX = 0;
+            this.cellY = 0;
+            this.xPlus = true;
+            turnLastGen = true;
+            this.generateCell();
         }
         // TODO: Rewrite the entire world gen bassically, relating to what side to spawn on
-
-        // Get Next Cell Side
-        private CellSide getNextCellSide(CellSide cellSide)
+        public void generateCell()
         {
-            currentStep++;
-            // TODO: Handle Turning
-            // Corner Behavior
-            switch (cellSide)
+            // We Generate Towards xPlus
+            List<IGameObject> cellGameObjects = new List<IGameObject>();
+            int cellWorldX = cellX * cellSize * cellNodeSize;
+            int cellWorldY = cellY * cellSize * cellNodeSize;
+            IGameObject cellBlock = nonPathCell.Clone();
+            cellBlock.setPosition(new Vector3(cellWorldX, -5, cellWorldY));
+            cellGameObjects.Add(cellBlock);
+            // Get Start Coords
+            Vector2 startPosition;
+            if (cellX == 0 && cellY == 0)
             {
-                case CellSide.YMinus:
-                    return CellSide.XPlus;
-                case CellSide.XPlus:
-                    return CellSide.YPlus;
-                case CellSide.YPlus:
-                    return CellSide.XMinus;
-                case CellSide.XMinus:
-                    return CellSide.YMinus;
+                startPosition = new Vector2(cellEndIndex / 2, cellEndIndex / 2);
             }
-            // We should never hit here
-            throw new Exception("Impossible Error");
-        }
-
-        // Start Turn
-        public void advanceTurn()
-        {
-            if (turnsTillNextCell <= 0)
+            else if (turnLastGen) {
+                // Turn towards Yplus
+                startPosition = new Vector2(cellEndIndex, 0);
+            }
+            else if (turnLastGen)
             {
-                // Create Start Position
-                Vector2 startPosition;
-                switch (lastSide)
-                {
-                    case CellSide.YMinus:
-                        startPosition = new Vector2(cellEndIndex, cellSize - 1);
-                        break;
-                    case CellSide.XPlus:
-                        startPosition = new Vector2(0, cellEndIndex);
-                        break;
-                    case CellSide.YPlus:
-                        startPosition = new Vector2(cellEndIndex, 0);
-                        break;
-                    case CellSide.XMinus:
-                        startPosition = new Vector2(cellSize - 1, cellEndIndex);
-                        break;
-                    default:
-                        throw new Exception("Impossible Error");
-                }
-                // Generate The Cell
-                Cell cell = genCell(startPosition, nextSide, nextCellX, nextCellY);
-                this.addWorldCell(cell);
-                // Increment The Next Cell Position
-                switch (nextSide)
-                {
-                    case CellSide.YMinus:
-                        nextCellY--;
-                        break;
-                    case CellSide.XPlus:
-                        nextCellX++;
-                        break;
-                    case CellSide.YPlus:
-                        nextCellY++;
-                        break;
-                    case CellSide.XMinus:
-                        nextCellX--;
-                        break;
-                    default:
-                        throw new Exception("Impossible Error");
-                }
-                // Setup for next
-                lastSide = nextSide;
-                nextSide = getNextCellSide(nextSide);
-                turnsTillNextCell = 0;
+                startPosition = new Vector2(cellEndIndex, cellSize-1);
             }
-            // Decrement turn Count
-            turnsTillNextCell--;
-        }
-
-        // Convert Cell Dir to int
-        private Vector2 makeExitCord(CellSide side, int cellIndex)
-        {
-            switch (side)
+            else if (xPlus)
             {
-                case CellSide.YMinus:
-                    return new Vector2(cellIndex, 0);
-                case CellSide.XPlus:
-                    return new Vector2(cellSize - 1, cellIndex);
-                case CellSide.YPlus:
-                    return new Vector2(cellIndex, cellSize - 1);
-                case CellSide.XMinus:
-                    return new Vector2(0, cellIndex);
-                default:
-                    // This code path is just here to satisfy type checker, will never be hit
-                    return new Vector2(-1, -1);
+                startPosition = new Vector2(0, cellEndIndex);
             }
-        }
-
-        // Generate Cell
-        private Cell genCell(Vector2 startPosition, CellSide exitSide, int cellX, int cellY)
-        {
-            int[,] cellGrid = new int[cellSize, cellSize];
+            else
+            {
+                startPosition = new Vector2(cellSize-1, cellEndIndex);
+            }
+            // Generate The Cell
             List<Vector3> cellPath = new List<Vector3>();
             do
             {
@@ -259,26 +182,27 @@ namespace Grade12Game
                     for (int j = 0; j < cellSize; j++)
                     {
                         cellList[i].Add(new Node(new Vector2(i, j), true));
-                        cellGrid[i, j] = 1;
                     }
                 }
                 // Choose A Random Position (Do Not Allow Corner Cells)
-                int endIndex = rand.Next(1, cellSize / 2);
-                switch (lastSide)
+                cellEndIndex = rand.Next(1, cellSize);
+                Vector2 endPosition;
+                if (cellX == mapXLength - 1 && !turnLastGen)
                 {
-                    case CellSide.YMinus:
-                    case CellSide.XMinus:
-                        endIndex += cellSize / 2;
-                        break;
+                    endPosition = new Vector2(cellEndIndex, cellSize - 1); ;
                 }
-                endIndex = 1;
-                cellEndIndex = endIndex;
-                Vector2 endPosition = makeExitCord(exitSide, endIndex);
-                // Add Obstacles in each corner
-                cellList[0][0].Walkable = false;
-                cellList[0][cellSize - 1].Walkable = false;
-                cellList[cellSize - 1][0].Walkable = false;
-                cellList[cellSize - 1][cellSize - 1].Walkable = false;
+                else if (cellX == 0 && !turnLastGen)
+                {
+                    endPosition = new Vector2(cellEndIndex, cellSize - 1);
+                }
+                else if (xPlus)
+                {
+                    endPosition = new Vector2(cellSize - 1, cellEndIndex);
+                }
+                else
+                {
+                    endPosition = new Vector2(0, cellEndIndex);
+                }
                 // Generate Random Obstacles
                 for (int i = 0; i < obstacleCount; i++)
                 {
@@ -294,7 +218,6 @@ namespace Grade12Game
                         continue;
                     }
                     cellList[obstacleX][obstacleY].Walkable = false;
-                    cellGrid[obstacleX, obstacleY] = 2;
                 }
                 // Solve Our PathFinding
                 Astar finder = new Astar(cellList);
@@ -313,63 +236,52 @@ namespace Grade12Game
                     Vector3 pos = new Vector3(
                         nodeWorldX + cellNodeSize / 2,
                         0,
-                        nodeWorldY+cellNodeSize/2
+                        nodeWorldY + cellNodeSize / 2
                     );
                     // Write Position
                     cellPath.Add(pos);
-                    cellGrid[(int)node.Position.X, (int)node.Position.Y] = 0;
-                }
-                // Clear start Pos
-                cellGrid[(int)startPosition.X, (int)startPosition.Y] = 3;
-                cellGrid[(int)endPosition.X, (int)endPosition.Y] = 4;
-            } while (cellPath.Count == 0);
-            // Build Our Cell GameObjects
-            IGameObject[,] cellGameObjects = new IGameObject[cellSize, cellSize];
-            int cellWorldX = cellX * cellSize * cellNodeSize;
-            int cellWorldY = cellY * cellSize * cellNodeSize;
-            for (int x = 0; x < cellSize; x++)
-            {
-                for (int y = 0; y < cellSize; y++)
-                {
-                    // Create The GameObject
-                    IGameObject gameObject;
-                    switch (cellGrid[x, y])
-                    {
-                        case 0:
-                            gameObject = pathCell.Clone();
-                            break;
-                        case 1:
-                            gameObject = nonPathCell.Clone();
-                            break;
-                        case 2:
-                            gameObject = nonPathCell.Clone();
-                            break;
-                        case 3:
-                            gameObject = pathCell.Clone();
-                            break;
-                        case 4:
-                            gameObject = pathCell.Clone();
-                            break;
-                        default:
-                            throw new Exception("Unknown Cell State");
-                    }
+                    // Writte to gameObjects
+                    IGameObject gameObject = pathCell.Clone();
                     // Set Position
-                    int localX = cellWorldX + x * cellNodeSize;
-                    int localY = cellWorldY + y * cellNodeSize;
-                    gameObject.setPosition(new Vector3(localX, -5, localY));
-                    // Set Props
-                    if (cellGrid[x, y] == 3)
-                    {
-                        Vector3 pos = gameObject.getPosition();
-                        pos.Y = 0;
-                        gameObject.setPosition(pos);
-                    }
-                    // Add The GameObject
-                    cellGameObjects[x, y] = gameObject;
+                    gameObject.setPosition(new Vector3(nodeWorldX, -5, nodeWorldY));
+                    // Add To Cell
+                    cellGameObjects.Add(gameObject);
                 }
+                // Add Our End Start Object
+                IGameObject startGameObject = pathCell.Clone();
+                // Set Position
+                startGameObject.setPosition(new Vector3(cellX * cellSize * cellNodeSize + startPosition.X * cellNodeSize, -5, cellY * cellSize * cellNodeSize + startPosition.Y * cellNodeSize));
+                // Add To Cell
+                cellGameObjects.Add(startGameObject);
+                // Add Our End Game Object
+                IGameObject endGameObject = pathCell.Clone();
+                // Set Position
+                endGameObject.setPosition(new Vector3(cellX * cellSize * cellNodeSize + endPosition.X * cellNodeSize, -5, cellY * cellSize * cellNodeSize + endPosition.Y * cellNodeSize));
+                // Add To Cell
+                cellGameObjects.Add(endGameObject);
+            } while (cellPath.Count == 0);
+            // Create Cell
+            Cell cell = new Cell(cellPath, cellGameObjects, cellX, cellY);
+            // Add To Cell List
+            this.addWorldCell(cell);
+            // Incr cellX and y
+            turnLastGen = false;
+            if (xPlus) cellX++;
+            else cellX--;
+            if (cellX >= mapXLength)
+            {
+                cellY++;
+                cellX--;
+                xPlus = false;
+                turnLastGen = true;
             }
-            // Return The cellGrid
-            return new Cell(cellPath, cellGrid, cellGameObjects, cellX, cellY);
+            if (cellX < 0)
+            {
+                cellY++;
+                cellX++;
+                xPlus = true;
+                turnLastGen = true;
+            }
         }
 
         // getGameObjects
@@ -449,14 +361,24 @@ namespace Grade12Game
             // Add The Cell
             world.Add(cell);
             // Add The Cell To The Collision World
-            for (int x = 0; x < cellSize; x++)
+            foreach (IGameObject gameObject in cell.cellObjects)
             {
-                for (int y = 0; y < cellSize; y++)
+                // Add The GameObject
+                RigidBody r = (RigidBody)gameObject;
+                r.AffectedByGravity = false;
+                r.IsStatic = true;
+                this.AddBody(r);
+            }
+            // Add Physics Objects for every cell
+            for (int i = 0; i < cellSize; i++)
+            {
+                for (int j = 0; j < cellSize; j++)
                 {
-                    // Get The GameObject
-                    IGameObject gameObject = cell.cellObjects[x, y];
-                    // Add The GameObject
-                    RigidBody r = (RigidBody)gameObject;
+                    float nodeWorldX = cell.cellX * cellSize * cellNodeSize + j * cellNodeSize;
+                    float nodeWorldY = cell.cellY * cellSize * cellNodeSize + i * cellNodeSize;
+                    IGameObject tmpNonPathCell = nonPathCell.Clone();
+                    tmpNonPathCell.setPosition(new Vector3(nodeWorldX, -5, nodeWorldY));
+                    RigidBody r = (RigidBody)tmpNonPathCell;
                     r.AffectedByGravity = false;
                     r.IsStatic = true;
                     this.AddBody(r);
@@ -469,13 +391,6 @@ namespace Grade12Game
         {
             Stack<Vector3> Path = new Stack<Vector3>();
             // Loop Through Cells
-            //for (int i = this.world.Count-1; i >= 0; i--)
-            //{
-            //    foreach (Vector3 n in this.world[i].path)
-            //    {
-            //        Path.Push(n);
-            //    }
-            //}
             foreach (Cell cell in this.world)
             {
                 foreach (Vector3 n in cell.path)
@@ -498,7 +413,7 @@ namespace Grade12Game
         // Start Wave
         public void startWave()
         {
-            this.advanceTurn();
+            this.generateCell();
             // Update Level and difficulty
             this.level++;
             // TODO: Change how we calculate difficulty
@@ -571,8 +486,30 @@ namespace Grade12Game
         // Update World
         public void Update(GameTime gameTime, InputHandler input)
         {
+            // debug Menu
+            if (input.clearWave)
+            {
+                foreach (Enemy e in this.getEnemies())
+                {
+                    e.DoDamage(e.getHealth());
+                }
+            }
+            if (input.toggleAutoPlay)
+            {
+                autoPlay = !autoPlay;
+            }
+            if (input.debugMenu)
+                debug = !debug;
             // Update Player
             player.Update(gameTime, input);
+            if (input.tpBase)
+            {
+                player.setPosition(new Vector3(this.getWorldPath().Last().X, player.getPosition().Y, this.getWorldPath().Last().Z));
+            }
+            if (input.tpStart)
+            {
+                player.setPosition(new Vector3(this.getWorldPath().First().X, player.getPosition().Y, this.getWorldPath().First().Z));
+            }
             // Spawn Turret
             if (input.isNumber1KeyPressed)
             {
@@ -612,7 +549,7 @@ namespace Grade12Game
             }
             // Map To KeyBind
             canStartWave = getEnemies().Count == 0;
-            if (canStartWave && input.startWave) this.startWave();
+            if ((canStartWave && input.startWave) || (canStartWave && autoPlay)) this.startWave();
             // Update Physics
             float step = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (step > 1.0f / 100.0f)
@@ -740,18 +677,10 @@ namespace Grade12Game
             // Render The Cells In The World
             foreach (Cell cell in this.world)
             {
-                // Calculate The Cell World Position
-                int cellWorldX = cell.cellX * cellSize * cellNodeSize;
-                int cellWorldY = cell.cellY * cellSize * cellNodeSize;
                 // Render Each Cell Node
-                int[,] cellGrid = cell.cellGrid;
-                IGameObject[,] cellGameObjects = cell.cellObjects;
-                for (int x = 0; x < cellSize; x++)
+                foreach (IGameObject gameObject in cell.cellObjects)
                 {
-                    for (int y = 0; y < cellSize; y++)
-                    {
-                        cellGameObjects[x, y].Draw(player, renderer);
-                    }
+                    gameObject.Draw(player, renderer);
                 }
             }
             // Render Wave Objects

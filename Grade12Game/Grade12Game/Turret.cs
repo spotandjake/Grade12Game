@@ -140,6 +140,7 @@ namespace Grade12Game
             {
                 this.currentShotRate = world.rand.Next((int)shotRate);
                 // Spawn Projectile
+                world.soundManager.ShootNoise();
                 Projectile projectile = world.spawnProjetile();
                 // Set Position
                 Vector3 pos = this.getPosition();
@@ -200,6 +201,7 @@ namespace Grade12Game
             {
                 this.currentShotRate = world.rand.Next((int)shotRate);
                 // Spawn Projectile
+                world.soundManager.ShootNoise();
                 Projectile projectile = world.spawnProjetile();
                 // Set Position
                 Vector3 pos = this.getPosition();
@@ -260,6 +262,7 @@ namespace Grade12Game
                 this.currentShotRate = (long)((double)shotRate * world.rand.NextDouble());
                 // Spawn First
                 // Spawn Projectile
+                world.soundManager.ShootNoise();
                 Projectile projectile = world.spawnProjetile();
                 // Set Position
                 Vector3 pos = this.getPosition();
@@ -275,6 +278,7 @@ namespace Grade12Game
                 projectile.LinearVelocity = new JVector((float)Math.Sin(this.rotation.Z) * projSpeed, 0, (float)Math.Cos(this.rotation.Z) * projSpeed);
                 // Spawn Second
                 // Spawn Projectile
+                world.soundManager.ShootNoise();
                 Projectile projectile2 = world.spawnProjetile();
                 // Set Position
                 Vector3 pos2 = this.getPosition();

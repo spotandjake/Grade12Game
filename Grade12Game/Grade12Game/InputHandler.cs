@@ -38,6 +38,14 @@ namespace Grade12Game
         public bool placeTower { get; private set; }
 
         public bool startWave { get; private set; }
+        public bool toggleAutoPlay { get; private set; }
+
+        public bool tpStart { get; private set; }
+        public bool tpBase { get; private set; }
+
+        // Dev Menu Options
+        public bool clearWave { get; private set; }
+        public bool debugMenu { get; private set; }
 
         // Constructor
         public InputHandler(PlayerIndex playerIndex)
@@ -100,6 +108,13 @@ namespace Grade12Game
             this.placeTower = isKeyPressed(Keys.Space) || padState.Buttons.RightShoulder == ButtonState.Pressed;
 
             this.startWave = isKeyPressed(Keys.F) || padState.Buttons.A == ButtonState.Pressed;
+            this.toggleAutoPlay = isKeyPressed(Keys.Tab) || padState.Buttons.LeftStick == ButtonState.Pressed;
+
+            this.tpStart = isKeyPressed(Keys.Z) || padState.Buttons.Y == ButtonState.Pressed;
+            this.tpBase = isKeyPressed(Keys.X) || padState.Buttons.X == ButtonState.Pressed;
+            // Developer Menu Stuff
+            this.clearWave = isKeyPressed(Keys.NumPad1);
+            this.debugMenu = isKeyPressed(Keys.NumPad2);
             // Allows the game to exit
             this.isExitDown =
                 padState.Buttons.Back == ButtonState.Pressed || keyState.IsKeyDown(Keys.Escape);

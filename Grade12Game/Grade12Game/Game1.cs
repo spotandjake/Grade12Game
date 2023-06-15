@@ -26,12 +26,14 @@ namespace Grade12Game
         SpriteBatch spriteBatch;
 
         Renderer renderer;
-        float farPlaneDistance = 800f; //Defines your plane distance, the higher, the less 3D 'fog' and the more is displayed
+        float farPlaneDistance = 10000f; //Defines your plane distance, the higher, the less 3D 'fog' and the more is displayed
 
         InputHandler inputHandler;
 
         Camera camera;
         WorldHandler world;
+
+        MidiPlayer soundManager;
 
         public Game1()
         {
@@ -53,8 +55,11 @@ namespace Grade12Game
                 GraphicsDevice.Viewport.Height,
                 farPlaneDistance
             );
-            this.camera = new Camera(new Vector3(0, 70, -50), new Vector3(0));
+            this.camera = new Camera(new Vector3(0, 70, -50), new Vector3(0, -MathHelper.Pi, 0));
             this.inputHandler = new InputHandler(PlayerIndex.One);
+            // Music
+            soundManager = new MidiPlayer();
+            soundManager.ManageMusic();
             // Physics Testing
             base.Initialize();
         }
@@ -127,15 +132,16 @@ namespace Grade12Game
             projectile.AffectedByGravity = false;
             // Create Our Block Templates
             Model nonPathModel = Content.Load<Model>("Models/cube"); //Loads your new model, point it towards your model
-            Shape pathShape = new BoxShape(20.0f, 20.0f, 20.0f);
+            Shape nonPathShape = new BoxShape(20.0f, 20.0f, 20.0f);
             GameObject nonPathBlock = new GameObject(
                 nonPathModel,
-                pathShape,
+                nonPathShape,
                 new Vector3(0),
                 new Vector3(0),
-                new Vector3(20)
+                new Vector3(20*11, 19.75f, 20 * 11)
             );
             Model pathModel = Content.Load<Model>("Models/path"); //Loads your new model, point it towards your model
+            Shape pathShape = new BoxShape(20.0f, 20.0f, 20.0f);
             GameObject pathBlock = new GameObject(
                 pathModel,
                 pathShape,
@@ -170,6 +176,7 @@ namespace Grade12Game
             this.world = new WorldHandler(
                 camera,
                 new CollisionSystemSAP(),
+                soundManager,
                 // Templates
                 nonPathBlock,
                 pathBlock,
